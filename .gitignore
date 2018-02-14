@@ -1,0 +1,12 @@
+*~
+*.bak
+*.swp
+*.tmp
+*.pyc
+.project
+.pydevproject
+.settings
+.DAV
+.DS_Store
+.idea
+.vscode
