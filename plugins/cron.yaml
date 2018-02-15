@@ -1,4 +1,4 @@
 cron:
 - description: Process logs
   url: /admin/cron/log_parser/process
-  schedule: every 10 minutes
+  schedule: every 5 minutes

@@ -49,10 +49,14 @@ def _get_date_from_filename(filename):
     return datetime.strptime(_get_foldername(filename), '%Y-%m-%d %H:%M:%S')
 
 
-def _get_initial_logs_date():
-    directories = cloudstorage.listbucket('/%s' % get_bucket_name(), delimiter='/')
-    oldest_directory = sorted(directories, key=lambda f: f.filename)[0]
-    return _get_date_from_filename(oldest_directory.filename + 'dummy.json')
+def _get_next_date(min_date=None):
+    directories = sorted([f.filename for f in cloudstorage.listbucket('/%s' % get_bucket_name(), delimiter='/')])
+    if not min_date:
+        return _get_date_from_filename(directories[0])
+    for directory in directories:
+        dir_date = _get_date_from_filename(directory)
+        if dir_date > min_date:
+            return dir_date
 
 
 def start_processing_logs():
@@ -63,7 +67,7 @@ def start_processing_logs():
     #     get_client().create_database('monitoring')
     #     config.last_date = None
     if not config.last_date:
-        config.last_date = _get_initial_logs_date()
+        config.last_date = _get_next_date()
         config.put()
     folder = u'/%s/%s/' % (get_bucket_name(), get_log_folder(config.last_date))
     processed_logs_key = ProcessedLogs.create_key(config.last_date)
@@ -74,7 +78,18 @@ def start_processing_logs():
     files_to_process = [f.filename for f in cloudstorage.listbucket(folder, delimiter='/')
                         if _get_foldername(f.filename) not in processed_logs_model.processed_files]
     for file_path in files_to_process:
+        logging.info('Starting task to process %s', file_path)
         deferred.defer(process_logs, file_path)
+    now = datetime.now()
+    current_hour_date = datetime(year=now.year, month=now.month, day=now.day, hour=now.hour)
+    if current_hour_date > config.last_date:
+        next_date = _get_next_date(config.last_date)
+        if not next_date:
+            logging.info('No new logs to process yet.')
+        elif next_date != config.last_date:
+            logging.info('Setting next date for log parsing from %s to %s', config.last_date, next_date)
+            config.last_date = next_date
+            config.put()
 
 
 def save_statistic_entries(entries):
