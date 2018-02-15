@@ -4,15 +4,18 @@ services:
     env_file:
       - .env
     image: influxdb
+    container_name: influxdb
     restart: unless-stopped
     ports:
       - "8086:8086"
     volumes:
       - ./monitoring/influxdb:/var/lib/influxdb
+      - ./monitoring/backup/influxdb:/tmp/backup
   grafana:
     env_file:
       - .env
     image: grafana/grafana
+    container_name: grafana
     restart: unless-stopped
     depends_on:
       - influxdb
@@ -20,3 +23,10 @@ services:
       - ./monitoring/grafana:/var/lib/grafana
     ports:
       - "3333:3333"
+  backup:
+    build: ./backup
+    container_name: log-parser-backup
+    volumes:
+      - ./monitoring/backup.tar.gz:/backup.tar.gz
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/code/credentials.json
