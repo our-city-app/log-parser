@@ -28,7 +28,7 @@ import cloudstorage
 from framework.plugin_loader import get_config
 from influxdb import InfluxDBClient
 
-MAX_DB_ENTRIES_PER_RPC = 10000
+MAX_DB_ENTRIES_PER_RPC = 500
 
 
 def get_client():

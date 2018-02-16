@@ -18,7 +18,6 @@ import json
 import re
 import urllib
 from datetime import datetime
-
 from google.appengine.api import urlfetch
 
 from mcfw.cache import cached
@@ -71,39 +70,40 @@ def callback_api(value):
             user_details = params['user_details']
         app_id = user_details['app_id']
         user_email = user_details['email']
-    if function_type == 'messaging.flow_member_result':
-        fields = {
-            'parent_message_key': params.get('parent_message_key')
-        }
-        if params.get('steps'):
-            fields['last_step_id'] = params['steps'][-1]['step_id']
-        yield {
-            'measurement': Measurements.FLOW_MEMBER_RESULTS,
-            'tags': {
-                'method': request_data.get('method'),
-                'tag': tag,
-                'flush_id': params.get('flush_id'),
-                'end_id': params.get('end_id'),
-                'app': app_id,
-                'service': value.get('user')
-            },
-            'time': timestamp,
-            'fields': fields
-        }
-    else:
-        yield {
-            'measurement': Measurements.CALLBACK_API,
-            'tags': {
-                'tag': parse_to_human_readable_tag(params.get('tag')),
-                'app': app_id,
-                'method': params.get('method'),
-                'service': value.get('user')
-            },
-            'time': timestamp,
-            'fields': {
-                'user': user_email
+    if tag and not tag.startswith('{'):
+        if function_type == 'messaging.flow_member_result':
+            fields = {
+                'parent_message_key': params.get('parent_message_key')
             }
-        }
+            if params.get('steps'):
+                fields['last_step_id'] = params['steps'][-1]['step_id']
+            yield {
+                'measurement': Measurements.FLOW_MEMBER_RESULTS,
+                'tags': {
+                    'method': request_data.get('method'),
+                    'tag': tag,
+                    'flush_id': params.get('flush_id'),
+                    'end_id': params.get('end_id'),
+                    'app': app_id,
+                    'service': value.get('user')
+                },
+                'time': timestamp,
+                'fields': fields
+            }
+        else:
+            yield {
+                'measurement': Measurements.CALLBACK_API,
+                'tags': {
+                    'tag': parse_to_human_readable_tag(params.get('tag')),
+                    'app': app_id,
+                    'method': params.get('method'),
+                    'service': value.get('user')
+                },
+                'time': timestamp,
+                'fields': {
+                    'user': user_email
+                }
+            }
 
 
 def app(value):
@@ -172,17 +172,21 @@ def api(value):
     #     u'response_data': {...},
     #     u'timestamp': 1518583750
     # }
+    tags = {
+        'method': value.get('function'),
+    }
+    fields = {
+        'success': value.get('success')
+    }
+
+    if 'user' in value:
+        tags['app_id'] = _get_app_id_by_service_hash(value['user'])
+        fields['service'] = value['user']
     yield {
         'measurement': Measurements.API_CALLS,
-        'tags': {
-            'method': value.get('function'),
-            'app_id': _get_app_id_by_service_hash(value['user'])
-        },
+        'tags': tags,
         'time': _get_time(value),
-        'fields': {
-            'service': value['user'],
-            'success': value.get('success')
-        }
+        'fields': fields
     }
 
 
