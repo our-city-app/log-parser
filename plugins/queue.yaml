@@ -1,0 +1,4 @@
+queue:
+- name: log-parsing
+  rate: 20/s
+  max_concurrent_requests: 5

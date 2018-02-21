@@ -16,10 +16,9 @@
 # @@license_version:1.4@@
 from datetime import datetime
 
+from framework.models.common import NdbModel
 from google.appengine.ext import ndb
 from plugins.log_parser.plugin_consts import NAMESPACE
-
-from framework.models.common import NdbModel
 
 
 def get_log_folder(date):
@@ -36,9 +35,16 @@ class LogParserSettings(NdbModel):
         return cls.get_or_insert('settings')
 
 
+class ProcessedFile(NdbModel):
+    NAMESPACE = NAMESPACE
+    filename = ndb.StringProperty()
+    line_number = ndb.IntegerProperty(default=0)
+    done = ndb.BooleanProperty()
+
+
 class ProcessedLogs(NdbModel):
     NAMESPACE = NAMESPACE
-    processed_files = ndb.StringProperty(repeated=True, indexed=False)  # List of filenames
+    processed_files = ndb.LocalStructuredProperty(ProcessedFile, repeated=True)  # type: list[ProcessedFile]
 
     def folder_name(self):
         return self.key.id().decode('utf-8')

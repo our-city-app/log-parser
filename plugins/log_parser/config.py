@@ -15,11 +15,13 @@
 #
 # @@license_version:1.4@@
 from framework.to import TO
-from mcfw.properties import unicode_property, typed_property
+
+from mcfw.properties import unicode_property, typed_property, long_property
 
 
 class InfluxConfig(TO):
     host = unicode_property('host')
+    port = long_property('port')
     db = unicode_property('db')
     username = unicode_property('username')
     password = unicode_property('password')
