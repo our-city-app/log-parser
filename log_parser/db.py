@@ -17,11 +17,12 @@
 
 import sqlite3
 import typing
-
+from datetime import datetime
 from log_parser.models import LogParserSettings, LogFile
 
 
 class DatabaseConnection(object):
+    connection = None
 
     def __init__(self, database_file: str) -> None:
         self.connection = sqlite3.connect(database_file)
@@ -35,29 +36,33 @@ class DatabaseConnection(object):
         self.connection.commit()
 
     def __del__(self):
-        self.connection and self.connection.close()
+         self.connection and self.connection.close()
 
     def get_settings(self) -> LogParserSettings:
-        result = self.connection.execute('SELECT last_date from settings WHERE id = 1').fetchone()
-        return LogParserSettings(*result)
+        qry = 'SELECT last_date from settings WHERE id = 1'
+        result = self.connection.execute(qry).fetchone()
+        last_date = None
+        if result:
+            last_date = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
+        return LogParserSettings(last_date)
 
     def save_settings(self, settings: LogParserSettings) -> LogParserSettings:
-        self.connection.execute('UPDATE OR ROLLBACK settings SET last_date = ? WHERE id = 1', settings.last_date)
+        qry = 'UPDATE OR ROLLBACK settings SET last_date = "%s" WHERE id = 1' % (str(settings.last_date))
+        self.connection.execute(qry)
         self.connection.commit()
         return settings
 
     def get_processed_logs(self, log_folder: str) -> typing.List[LogFile]:
-        results = self.connection.execute('SELECT name, file_name FROM log_files WHERE folder_name = ?',
-                                          log_folder).fetchall()
+        qry = 'SELECT folder_name, file_name FROM log_files WHERE folder_name = "%s"' % (log_folder)
+        results = self.connection.execute(qry).fetchall()
         return [LogFile(*result) for result in results]
 
     def save_processed_file(self, folder_name: str, file_name: str) -> None:
-        self.connection.execute('INSERT OR IGNORE INTO log_files (folder_name, file_name) VALUES (?, ?)', folder_name,
-                                file_name)
+        qry = 'INSERT OR IGNORE INTO log_files (folder_name, file_name) VALUES ("%s", "%s")' % (folder_name, file_name)
+        self.connection.execute(qry)
         self.connection.commit()
 
     def get_processed_log(self, log_folder: str, file_name: str):
-        result = self.connection.execute(
-            'SELECT name, file_name FROM log_files WHERE folder_name = ? AND file_name = ?',
-            log_folder, file_name).fetchone()
+        qry = 'SELECT folder_name, file_name FROM log_files WHERE folder_name = "%s" AND file_name = "%s"' % (log_folder, file_name)
+        result = self.connection.execute(qry).fetchone()
         return LogFile(*result) if result else None

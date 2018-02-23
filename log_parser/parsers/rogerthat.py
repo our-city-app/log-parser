@@ -21,8 +21,6 @@ from datetime import datetime
 from functools import lru_cache
 from typing import Union, Iterator, Any
 
-from google.appengine.api import urlfetch
-
 HUMAN_READABLE_TAG_REGEX = re.compile('(.*?)\\s*\\{.*\\}')
 
 
@@ -192,9 +190,10 @@ def api(value: dict) -> Iterator[Any]:
 
 @lru_cache(maxsize=1000)
 def _get_app_id_by_service_hash(service_hash: str) -> Union[str, None]:
-    # TODO refactor to not use urlfetch
     qry_string = urllib.urlencode({'user': service_hash})
-    res = urlfetch.fetch('https://rogerth.at/unauthenticated/service-app?' + qry_string)
-    if res.status_code != 200:
+    res = urllib.request.urlopen('https://rogerth.at/unauthenticated/service-app?' + qry_string)
+    rbody = res.read()
+    rcode = res.code
+    if rcode != 200:
         raise Exception('Failed to get app_id for service hash %s', service_hash)
-    return json.loads(res.content)['app_id']
+    return json.loads(rbody)['app_id']

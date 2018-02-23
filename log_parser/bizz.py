@@ -47,7 +47,9 @@ def _get_date_from_filename(filename):
 
 
 def _get_next_date(cloudstorage_bucket: Bucket, min_date: datetime = None) -> Optional[datetime]:
-    directories = sorted([f.filename for f in cloudstorage_bucket.list_blobs(delimiter='/')])
+    directories = sorted([f.name for f in cloudstorage_bucket.list_blobs()])
+    if not directories:
+        return
     if not min_date:
         return _get_date_from_filename(directories[0])
     for directory in directories:
@@ -58,8 +60,10 @@ def _get_next_date(cloudstorage_bucket: Bucket, min_date: datetime = None) -> Op
 
 def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -> Iterator[str]:
     settings = db.get_settings()
+    print('start_processing_logs from:', settings.last_date)
     if not settings.last_date:
         settings.last_date = _get_next_date(cloudstorage_bucket)
+        print('start_processing_logs next:', settings.last_date)
         db.save_settings(settings)
     folder = u'/%s/%s/' % (cloudstorage_bucket.name, get_log_folder(settings.last_date))
     log_folder = get_log_folder(settings.last_date)

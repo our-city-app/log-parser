@@ -13,4 +13,5 @@
 /backup/credentials.json
 /monitoring
 configuration.json
+credentials.json
 .mypy_cache/

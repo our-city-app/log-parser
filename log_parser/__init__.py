@@ -14,9 +14,11 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
+
 import argparse
 import json
 import time
+import os
 from multiprocessing.pool import Pool
 
 from google.cloud import storage
@@ -29,9 +31,11 @@ from log_parser.db import DatabaseConnection
 
 def main(thread_count: int, configuration: LogParserConfig):
     pool = Pool(thread_count)
-    db = DatabaseConnection('../monitoring/parser/db.sqlite')
+    db = DatabaseConnection(os.path.join(os.path.dirname(__file__),'..', 'monitoring', 'parser', 'db.sqlite'))
     # todo: auth via service account (try GOOGLE_APPLICATION_CREDENTIALS=credentials.json env var?)
-    cloudstorage_bucket = storage.Client().bucket(configuration.cloudstorage_bucket)
+
+    storage_client = storage.Client.from_service_account_json(os.path.join(os.path.dirname(__file__), '..', 'credentials.json'))
+    cloudstorage_bucket = storage_client.bucket(configuration.cloudstorage_bucket)
     influxdb_client = influx.get_client(configuration)
 
     def process_file(file_name: str) -> None:
@@ -46,6 +50,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Processes logs uploaded on cloudstorage')
     parser.add_argument('--threads', type=int, help='Number of threads for the processing')
     args = parser.parse_args()
-    with open('../configuration.json', 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), '..', 'configuration.json'), 'r') as f:
         configuration = LogParserConfig(json.load(f))
     main(args.threads, configuration)
