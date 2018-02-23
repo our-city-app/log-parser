@@ -14,18 +14,16 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
+from influxdb import InfluxDBClient
 
-from config import LogParserConfig
-from framework.plugin_loader import Plugin
-from framework.utils.plugins import Handler
-from handlers import ProcessLogsHandler
+from log_parser import LogParserConfig
 
 
-class LogParserPlugin(Plugin):
-    def __init__(self, configuration):
-        super(LogParserPlugin, self).__init__(LogParserConfig.from_dict(configuration))
-        assert isinstance(self.configuration, LogParserConfig)
-
-    def get_handlers(self, auth):
-        if auth == Handler.AUTH_ADMIN:
-            yield Handler('/admin/cron/log_parser/process', ProcessLogsHandler)
+def get_client(config: LogParserConfig) -> InfluxDBClient:
+    return InfluxDBClient(host=config.influxdb.host,
+                          port=config.influxdb.port,
+                          ssl=config.debug,
+                          verify_ssl=config.debug,
+                          database=config.influxdb.db,
+                          username=config.influxdb.username,
+                          password=config.influxdb.password)

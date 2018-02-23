@@ -1,4 +1,0 @@
-cron:
-- description: Process logs
-  url: /admin/cron/log_parser/process
-  schedule: every 5 minutes

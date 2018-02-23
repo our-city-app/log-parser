@@ -18,10 +18,10 @@ import json
 import re
 import urllib
 from datetime import datetime
-from google.appengine.api import urlfetch
+from functools import lru_cache
+from typing import Union, Iterator, Any
 
-from mcfw.cache import cached
-from mcfw.rpc import returns, arguments
+from google.appengine.api import urlfetch
 
 HUMAN_READABLE_TAG_REGEX = re.compile('(.*?)\\s*\\{.*\\}')
 
@@ -33,11 +33,11 @@ class Measurements(object):
     MESSAGES = 'rogerthat.messages'
 
 
-def _get_time(value):
+def _get_time(value: dict) -> str:
     return datetime.utcfromtimestamp(value['timestamp']).isoformat() + 'Z'
 
 
-def parse_to_human_readable_tag(tag):
+def parse_to_human_readable_tag(tag: str) -> Union[str, None]:
     if not tag:
         return None
 
@@ -55,7 +55,7 @@ def parse_to_human_readable_tag(tag):
     return tag
 
 
-def callback_api(value):
+def callback_api(value: dict) -> Iterator[Any]:
     request_data = value.get('request_data', {})
     function_type = value.get('function') or request_data.get('method')
     timestamp = _get_time(value)
@@ -106,7 +106,7 @@ def callback_api(value):
             }
 
 
-def app(value):
+def app(value: dict) -> Iterator[Any]:
     # {
     #   "timestamp": 1518603982,
     #   "request_data": {
@@ -162,7 +162,7 @@ def app(value):
                 }
 
 
-def api(value):
+def api(value: dict) -> Iterator[Any]:
     # value = {
     #     u'function': u'system.get_identity',
     #     u'success': True,
@@ -190,10 +190,9 @@ def api(value):
     }
 
 
-@cached(1, lifetime=3600 * 24 * 7)
-@returns(unicode)
-@arguments(service_hash=unicode)
-def _get_app_id_by_service_hash(service_hash):
+@lru_cache(maxsize=1000)
+def _get_app_id_by_service_hash(service_hash: str) -> Union[str, None]:
+    # TODO refactor to not use urlfetch
     qry_string = urllib.urlencode({'user': service_hash})
     res = urlfetch.fetch('https://rogerth.at/unauthenticated/service-app?' + qry_string)
     if res.status_code != 200:

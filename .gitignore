@@ -12,3 +12,5 @@
 .vscode
 /backup/credentials.json
 /monitoring
+configuration.json
+.mypy_cache/

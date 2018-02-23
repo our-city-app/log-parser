@@ -14,5 +14,15 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
+from datetime import datetime
 
-NAMESPACE = 'log_parser'
+
+class LogParserSettings(object):
+    def __init__(self, last_date: datetime) -> None:
+        self.last_date = last_date
+
+
+class LogFile(object):
+    def __init__(self, folder_name: str, file_name: str) -> None:
+        self.folder_name = folder_name
+        self.file_name = file_name

@@ -14,12 +14,13 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
-from cStringIO import StringIO
-
-from plugins.log_parser.parsers import request_log, rogerthat
-from plugins.log_parser.parsers.filter import registry, request_filter
+from typing import Any, Iterator
 
 import ijson
+from cStringIO import StringIO
+
+from log_parser.parsers import request_log, rogerthat
+from log_parser.parsers.filter import registry, request_filter
 
 OTHER = object()
 
@@ -34,13 +35,13 @@ log_types = {
 
 
 @request_filter('')
-def process_log(value):
+def process_log(value: dict) -> Iterator[Any]:
     type_ = value.get('type')
     f = log_types.get(type_)
     return f and f(value)
 
 
-def analyze(line):
+def analyze(line: str) -> Iterator[Any]:
     readers = {}
     f = StringIO(line)
     try:

@@ -15,10 +15,12 @@
 #
 # @@license_version:1.4@@
 from datetime import datetime
-from urlparse import urlparse
+from typing import Any, Iterator
+
+from urllib.urlparse import urlparse
 
 
-def process(value):
+def process(value: dict) -> Iterator[Any]:
     request_info = value['data']
     tags = {
         'project': request_info.get('app_id'),  # e.g. e~rogerthat-server,
