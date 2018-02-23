@@ -16,7 +16,7 @@
 # @@license_version:1.4@@
 from influxdb import InfluxDBClient
 
-from log_parser import LogParserConfig
+from log_parser.config import LogParserConfig
 
 
 def get_client(config: LogParserConfig) -> InfluxDBClient:

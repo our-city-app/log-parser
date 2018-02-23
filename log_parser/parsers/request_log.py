@@ -16,9 +16,7 @@
 # @@license_version:1.4@@
 from datetime import datetime
 from typing import Any, Iterator
-
-from urllib.urlparse import urlparse
-
+from urllib.parse import urlparse
 
 def process(value: dict) -> Iterator[Any]:
     request_info = value['data']

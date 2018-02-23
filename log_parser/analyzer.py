@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
+import io
 from typing import Any, Iterator
 
 import ijson
-from cStringIO import StringIO
 
 from log_parser.parsers import request_log, rogerthat
 from log_parser.parsers.filter import registry, request_filter
@@ -43,7 +43,7 @@ def process_log(value: dict) -> Iterator[Any]:
 
 def analyze(line: str) -> Iterator[Any]:
     readers = {}
-    f = StringIO(line)
+    f = io.StringIO(line)
     try:
         for key, type_, value in ijson.parse(f):
             listeners = registry.get(key, OTHER)
