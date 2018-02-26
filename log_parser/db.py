@@ -15,21 +15,25 @@
 #
 # @@license_version:1.4@@
 
-import os
 import json
-#import sqlite3
+import os
 import typing
 from datetime import datetime
+
 from log_parser.models import LogParserSettings, LogFile
+
 
 def touch(path):
     with open(path, 'a'):
         os.utime(path, None)
 
+
 def create_folder(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+
+# todo: use a database (mysql or something)
 class DatabaseConnection(object):
     root_dir = None
 
@@ -41,13 +45,13 @@ class DatabaseConnection(object):
         if not os.path.exists(f_path):
             return LogParserSettings(None)
         with open(f_path, 'r') as f:
-            settings = LogParserSettings(json.load(f)['last_date'])
+            settings = LogParserSettings(datetime.strptime(json.load(f)['last_date'], '%Y-%m-%dT%H:%M:%S'))
         return settings
 
     def save_settings(self, settings: LogParserSettings) -> LogParserSettings:
         f_path = os.path.join(self.root_dir, 'settings.json')
         with open(f_path, 'w') as f:
-            f.write(json.dumps(settings.__dict__))
+            f.write(json.dumps({'last_date': settings.last_date.isoformat()}))
         return settings
 
     def get_processed_logs(self, log_folder: str) -> typing.List[LogFile]:
@@ -64,7 +68,7 @@ class DatabaseConnection(object):
         f_path = os.path.join(self.root_dir, year, log_folder, file_name)
         touch(f_path)
 
-    def get_processed_log(self, log_folder: str, file_name: str):
+    def get_processed_log(self, log_folder: str, file_name: str) -> typing.Union[LogFile, None]:
         year = log_folder.split('-')[0]
         create_folder(os.path.join(self.root_dir, year))
         f_path = os.path.join(self.root_dir, year, log_folder, file_name)

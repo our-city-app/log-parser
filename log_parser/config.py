@@ -21,6 +21,7 @@ class InfluxConfig(object):
         self.host = config.get('host')  # type: str
         self.port = config.get('port')  # type: int
         self.db = config.get('db')  # type: str
+        self.ssl = config.get('ssl', False)  # type: bool
         self.username = config.get('username')  # type: str
         self.password = config.get('password')  # type: str
 

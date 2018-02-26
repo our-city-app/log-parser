@@ -17,51 +17,73 @@
 
 import argparse
 import json
-import time
+import logging
 import os
+import time
 from multiprocessing.pool import Pool
 
 from google.cloud import storage
+from influxdb import InfluxDBClient
 
-from log_parser import influx
 from log_parser.bizz import start_processing_logs, process_logs
 from log_parser.config import LogParserConfig
 from log_parser.db import DatabaseConnection
-import logging
+
+logging.basicConfig(format='%(levelname)-8s %(process)s %(asctime)s,%(msecs)3.0f [%(filename)s:%(lineno)d] %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    level=logging.DEBUG)
+logging.getLogger('urllib3').setLevel(logging.WARNING)
+CURRENT_DIR = os.path.dirname(__file__)
+
 
 def get_gcs_bucket(cloudstorage_bucket):
-    storage_client = storage.Client.from_service_account_json(os.path.join(os.path.dirname(__file__), '..', 'credentials.json'))
+    storage_client = storage.Client.from_service_account_json(os.path.join(CURRENT_DIR, 'credentials.json'))
     return storage_client.bucket(cloudstorage_bucket)
 
-def process_file(file_name) -> None:
-    with open(os.path.join(os.path.dirname(__file__), '..', 'configuration.json'), 'r') as f:
-        configuration = LogParserConfig(json.load(f))
-    db = DatabaseConnection(os.path.join(os.path.dirname(__file__),'..', 'monitoring', 'parser'))
 
+def process_file(file_name: str, db: DatabaseConnection, influxdb_client: InfluxDBClient,
+                 configuration: LogParserConfig) -> None:
     cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
-
-    influxdb_client = influx.get_client(configuration)
     process_logs(db, influxdb_client, cloudstorage_bucket, file_name)
 
-def main(thread_count: int, configuration: LogParserConfig):
-    pool = Pool(thread_count)
-    db = DatabaseConnection(os.path.join(os.path.dirname(__file__),'..', 'monitoring', 'parser'))
-    cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
 
+def get_client(config: LogParserConfig) -> InfluxDBClient:
+    return InfluxDBClient(host=config.influxdb.host,
+                          port=config.influxdb.port,
+                          ssl=config.influxdb.ssl,
+                          verify_ssl=config.influxdb.ssl,
+                          database=config.influxdb.db,
+                          username=config.influxdb.username,
+                          password=config.influxdb.password)
+
+
+def main(process_count: int):
+    logging.info('Starting log parser with %s processes', process_count)
+    pool = Pool(process_count, maxtasksperchild=1)
+    with open(os.path.join(os.path.dirname(__file__), 'configuration.json'), 'r') as f:
+        configuration = LogParserConfig(json.load(f))
+    db = DatabaseConnection(os.path.join(CURRENT_DIR, '..', 'parser'))
+    cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
+    influxdb_client = get_client(configuration)
     while True:
-        for fn in start_processing_logs(db, cloudstorage_bucket):
+        iterable = list(start_processing_logs(db, cloudstorage_bucket))
+        if len(iterable) == 0:
+            logging.info('Nothing to process, sleeping %s seconds.', configuration.interval)
+            time.sleep(configuration.interval)
+            continue
+        logging.info('Processing %s files', len(iterable))
+        for file_name in iterable:
             if configuration.debug:
-                process_file(fn)
+                process_file(file_name, db, influxdb_client, configuration)
             else:
-                pool.map(process_file, [fn])
-        time.sleep(configuration.interval)
+                pool.apply_async(process_file, [file_name, db, influxdb_client, configuration])
+
+
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser(description='Processes logs uploaded on cloudstorage')
-    parser.add_argument('--threads', type=int, help='Number of threads for the processing')
+    parser.add_argument('--processes', type=int, help='Number of processes to use', default=os.cpu_count())
     args = parser.parse_args()
-    with open(os.path.join(os.path.dirname(__file__), '..', 'configuration.json'), 'r') as f:
-        configuration = LogParserConfig(json.load(f))
-    main(args.threads, configuration)
+    main(args.processes)

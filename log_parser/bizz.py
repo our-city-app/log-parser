@@ -18,7 +18,7 @@ import logging
 import tempfile
 import types
 from datetime import datetime
-from typing import Optional, Iterator, Any
+from typing import Optional, Iterator, List, Union, Dict
 
 from google.cloud.storage import Bucket, Blob
 from influxdb import InfluxDBClient
@@ -26,7 +26,7 @@ from influxdb import InfluxDBClient
 from log_parser.analyzer import analyze
 from log_parser.db import DatabaseConnection
 
-MAX_DB_ENTRIES_PER_RPC = 500
+MAX_DB_ENTRIES_PER_RPC = 5000
 LOG_PARSING_QUEUE = 'log-parsing'
 
 
@@ -49,39 +49,39 @@ def _get_date_from_filename(filename):
 def _get_next_date(cloudstorage_bucket: Bucket, min_date: datetime = None) -> Optional[datetime]:
     directories = sorted([f.name for f in cloudstorage_bucket.list_blobs()])
     if not directories:
-        return
+        return None
     if not min_date:
         return _get_date_from_filename(directories[0])
     for directory in directories:
         dir_date = _get_date_from_filename(directory)
         if dir_date > min_date:
             return dir_date
+    else:
+        return None
 
 
 def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -> Iterator[str]:
     settings = db.get_settings()
-    logging.warning('start_processing_logs from: %s', settings.last_date_object())
+    logging.info('Starting processing logs from %s', settings.last_date)
     if not settings.last_date:
-        settings.last_date = str(_get_next_date(cloudstorage_bucket))
-        logging.warning('start_processing_logs next: %s', settings.last_date_object())
+        settings.last_date = _get_next_date(cloudstorage_bucket)
         db.save_settings(settings)
-    log_folder = get_log_folder(settings.last_date_object())
+    log_folder = get_log_folder(settings.last_date)
     processed_logs = db.get_processed_logs(log_folder)
     done_log_filenames = [f for f in processed_logs]
-    files_to_process = [f.name for f in cloudstorage_bucket.list_blobs(prefix=get_log_folder(settings.last_date_object()))
+    files_to_process = [f.name for f in cloudstorage_bucket.list_blobs(prefix=log_folder)
                         if _get_filename(f.name) not in done_log_filenames]
-    logging.warning('files_to_process: %s', files_to_process)
     for file_path in files_to_process:
         yield file_path
     now = datetime.now()
     current_hour_date = datetime(year=now.year, month=now.month, day=now.day, hour=now.hour)
-    if current_hour_date > settings.last_date_object():
-        next_date = _get_next_date(cloudstorage_bucket, settings.last_date_object())
+    if current_hour_date > settings.last_date:
+        next_date = _get_next_date(cloudstorage_bucket, settings.last_date)
         if not next_date:
             logging.info('No new logs to process yet.')
-        elif next_date != settings.last_date_object():
-            logging.info('Setting next date for log parsing from %s to %s', settings.last_date_object(), next_date)
-            settings.last_date = str(next_date)
+        elif next_date != settings.last_date:
+            logging.info('Setting next date for log parsing from %s to %s', settings.last_date, next_date)
+            settings.last_date = next_date
             db.save_settings(settings)
 
 
@@ -90,14 +90,14 @@ def save_statistic_entries(client, entries) -> bool:
     return client.write_points(entries, batch_size=MAX_DB_ENTRIES_PER_RPC)
 
 
-def flatten(l: Any) -> Iterator[str]:
+def flatten(l: Union[Iterator[Dict], Iterator[Iterator[Dict]]]) -> Iterator[Dict]:
     for sublist in l:
         if sublist:
             if isinstance(sublist, types.GeneratorType):
                 for item in sublist:
                     if item:
                         yield item
-            else:
+            elif isinstance(sublist, dict):
                 yield sublist
 
 
@@ -111,7 +111,7 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
     if processed_log:
         logging.warning('File %s already processed, doing nothing', bucket_path)
         return
-    to_save = []
+    to_save = []  # type: List[dict]
     logging.info('Downloading %s', bucket_path)
     blob = Blob(bucket_path, cloudstorage_bucket)
     with tempfile.NamedTemporaryFile(delete=True) as file_obj:
@@ -127,7 +127,7 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
                 break
             line_number += 1
             if line_number % 1000 == 0:
-                logging.info('Processing line %s', line_number)
+                logging.info('Processing line %s of %s', line_number, bucket_path)
             to_save.extend(flatten(analyze(line)))
             
             if len(to_save) > MAX_DB_ENTRIES_PER_RPC:

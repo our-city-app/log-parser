@@ -28,6 +28,7 @@ class Measurements(object):
     FLOW_MEMBER_RESULTS = 'rogerthat.flow_member_result'
     CALLBACK_API = 'rogerthat.callback_api'
     API_CALLS = 'rogerthat.api_calls'
+    CLIENT_CALL = 'rogerthat.client_call'
     MESSAGES = 'rogerthat.messages'
 
 
@@ -138,13 +139,15 @@ def app(value: dict) -> Iterator[Any]:
     #   "user": "c356f0adc203397a9d89ff9e1a6e6b54:em-be-idola"
     # }
     request_data = value.get('request_data', {})
-    user = value.get('user', 'unknown')
+    UNKNOWN = 'unknown'
+    user = value.get('user', UNKNOWN)
     if ':' in user:
         user, app = user.split(':', 1)
     elif user:
         app = 'rogerthat'
     else:
-        app = 'unknown'
+        app = UNKNOWN
+    # Results
     for r in request_data.get('r', []):
         if r.get('item', {}).get('r'):
             if r['item']['r'].keys() == ['received_timestamp']:
@@ -158,6 +161,20 @@ def app(value: dict) -> Iterator[Any]:
                         'user': user
                     }
                 }
+    client_calls = request_data.get('c', [])
+    for call in client_calls:
+        if 't' in call:
+            yield {
+                'measurement': Measurements.CLIENT_CALL,
+                'tags': {
+                    'app': app,
+                    'type': call.get('f', UNKNOWN)
+                },
+                'time': datetime.utcfromtimestamp(call['t']).isoformat() + 'Z',
+                'fields': {
+                    'user': user
+                }
+            }
 
 
 def api(value: dict) -> Iterator[Any]:

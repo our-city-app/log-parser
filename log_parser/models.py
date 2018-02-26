@@ -15,16 +15,12 @@
 #
 # @@license_version:1.4@@
 from datetime import datetime
+from typing import Union
 
 
 class LogParserSettings(object):
-    def __init__(self, last_date: datetime) -> None:
+    def __init__(self, last_date: Union[datetime, None]) -> None:
         self.last_date = last_date
-
-    def last_date_object(self) -> datetime:
-        if not self.last_date:
-            return None
-        return datetime.strptime(self.last_date, '%Y-%m-%d %H:%M:%S')
 
 
 class LogFile(object):

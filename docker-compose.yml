@@ -6,8 +6,6 @@ services:
     image: influxdb
     container_name: influxdb
     restart: unless-stopped
-    ports:
-      - "8086:8086"
     volumes:
       - ./monitoring/influxdb:/var/lib/influxdb
       - ./monitoring/backup/influxdb:/tmp/backup
@@ -23,6 +21,18 @@ services:
       - ./monitoring/grafana:/var/lib/grafana
     ports:
       - "3333:3333"
+  log_parser:
+    build: .
+    container_name: log_parser
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+    volumes:
+      - ./monitoring/parser:/code/parser
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'
   backup:
     build: ./backup
     container_name: log-parser-backup

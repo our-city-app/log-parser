@@ -15,10 +15,11 @@
 #
 # @@license_version:1.4@@
 from datetime import datetime
-from typing import Any, Iterator
+from typing import Iterator, Dict, Any
 from urllib.parse import urlparse
 
-def process(value: dict) -> Iterator[Any]:
+
+def process(value: dict) -> Iterator[Dict[str, Any]]:
     request_info = value['data']
     tags = {
         'project': request_info.get('app_id'),  # e.g. e~rogerthat-server,
@@ -31,7 +32,7 @@ def process(value: dict) -> Iterator[Any]:
     if request_info.get('task_name'):
         tags['task_name'] = request_info['task_name']
         tags['task_queue_name'] = request_info['task_queue_name']
-    return {
+    yield {
         'measurement': 'request-info',
         'tags': tags,
         'time': datetime.utcfromtimestamp(request_info['start_time']).isoformat() + 'Z',
