@@ -29,10 +29,6 @@ services:
       - influxdb
     volumes:
       - ./monitoring/parser:/code/parser
-    deploy:
-      resources:
-        limits:
-          cpus: '8.0'
   backup:
     build: ./backup
     container_name: log-parser-backup
