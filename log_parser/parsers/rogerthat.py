@@ -161,7 +161,7 @@ def app(value: dict) -> Iterator[Any]:
                         'user': user
                     }
                 }
-    client_calls = request_data.get('c', [])
+    client_calls = value.get('response_data', {}).get('c', []) + request_data.get('c', [])
     for call in client_calls:
         if 't' in call:
             yield {

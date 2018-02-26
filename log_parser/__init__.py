@@ -84,6 +84,6 @@ def main(process_count: int):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser(description='Processes logs uploaded on cloudstorage')
-    parser.add_argument('--processes', type=int, help='Number of processes to use', default=os.cpu_count())
+    parser.add_argument('--processes', type=int, help='Number of processes to use', default=os.cpu_count() * 2)
     args = parser.parse_args()
     main(args.processes)
