@@ -15,54 +15,59 @@
 #
 # @@license_version:1.4@@
 
-import sqlite3
+import os
+import json
+#import sqlite3
 import typing
 from datetime import datetime
 from log_parser.models import LogParserSettings, LogFile
 
+def touch(path):
+    with open(path, 'a'):
+        os.utime(path, None)
+
+def create_folder(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 class DatabaseConnection(object):
-    connection = None
+    root_dir = None
 
-    def __init__(self, database_file: str) -> None:
-        self.connection = sqlite3.connect(database_file)
-        self.connection.execute('CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, last_date DATETIME)')
-        self.connection.execute('CREATE TABLE IF NOT EXISTS log_files (folder_name TEXT, file_name TEXT)')
-        self.connection.execute('INSERT OR IGNORE INTO settings(id, last_date) VALUES(1, null);')
-        self.connection.commit()
-
-    def execute(self, query):
-        self.connection.execute(query)
-        self.connection.commit()
-
-    def __del__(self):
-         self.connection and self.connection.close()
+    def __init__(self, root_dir) -> None:
+        self.root_dir = root_dir
 
     def get_settings(self) -> LogParserSettings:
-        qry = 'SELECT last_date from settings WHERE id = 1'
-        result = self.connection.execute(qry).fetchone()
-        last_date = None
-        if result:
-            last_date = datetime.strptime(result[0], '%Y-%m-%d %H:%M:%S')
-        return LogParserSettings(last_date)
+        f_path = os.path.join(self.root_dir, 'settings.json')
+        if not os.path.exists(f_path):
+            return LogParserSettings(None)
+        with open(f_path, 'r') as f:
+            settings = LogParserSettings(json.load(f)['last_date'])
+        return settings
 
     def save_settings(self, settings: LogParserSettings) -> LogParserSettings:
-        qry = 'UPDATE OR ROLLBACK settings SET last_date = "%s" WHERE id = 1' % (str(settings.last_date))
-        self.connection.execute(qry)
-        self.connection.commit()
+        f_path = os.path.join(self.root_dir, 'settings.json')
+        with open(f_path, 'w') as f:
+            f.write(json.dumps(settings.__dict__))
         return settings
 
     def get_processed_logs(self, log_folder: str) -> typing.List[LogFile]:
-        qry = 'SELECT folder_name, file_name FROM log_files WHERE folder_name = "%s"' % (log_folder)
-        results = self.connection.execute(qry).fetchall()
-        return [LogFile(*result) for result in results]
+        year = log_folder.split('-')[0]
+        create_folder(os.path.join(self.root_dir, year))
+        f_path = os.path.join(self.root_dir, year, log_folder)
+        if not os.path.exists(f_path):
+            return []
+        return os.listdir(f_path)
 
-    def save_processed_file(self, folder_name: str, file_name: str) -> None:
-        qry = 'INSERT OR IGNORE INTO log_files (folder_name, file_name) VALUES ("%s", "%s")' % (folder_name, file_name)
-        self.connection.execute(qry)
-        self.connection.commit()
+    def save_processed_file(self, log_folder: str, file_name: str) -> None:
+        year = log_folder.split('-')[0]
+        create_folder(os.path.join(self.root_dir, year, log_folder))
+        f_path = os.path.join(self.root_dir, year, log_folder, file_name)
+        touch(f_path)
 
     def get_processed_log(self, log_folder: str, file_name: str):
-        qry = 'SELECT folder_name, file_name FROM log_files WHERE folder_name = "%s" AND file_name = "%s"' % (log_folder, file_name)
-        result = self.connection.execute(qry).fetchone()
-        return LogFile(*result) if result else None
+        year = log_folder.split('-')[0]
+        create_folder(os.path.join(self.root_dir, year))
+        f_path = os.path.join(self.root_dir, year, log_folder, file_name)
+        if not os.path.exists(f_path):
+            return None
+        return LogFile(log_folder, file_name)

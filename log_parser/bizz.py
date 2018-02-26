@@ -20,7 +20,7 @@ import types
 from datetime import datetime
 from typing import Optional, Iterator, Any
 
-from google.cloud.storage import Bucket
+from google.cloud.storage import Bucket, Blob
 from influxdb import InfluxDBClient
 
 from log_parser.analyzer import analyze
@@ -60,28 +60,28 @@ def _get_next_date(cloudstorage_bucket: Bucket, min_date: datetime = None) -> Op
 
 def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -> Iterator[str]:
     settings = db.get_settings()
-    print('start_processing_logs from:', settings.last_date)
+    logging.warning('start_processing_logs from: %s', settings.last_date_object())
     if not settings.last_date:
-        settings.last_date = _get_next_date(cloudstorage_bucket)
-        print('start_processing_logs next:', settings.last_date)
+        settings.last_date = str(_get_next_date(cloudstorage_bucket))
+        logging.warning('start_processing_logs next: %s', settings.last_date_object())
         db.save_settings(settings)
-    folder = u'/%s/%s/' % (cloudstorage_bucket.name, get_log_folder(settings.last_date))
-    log_folder = get_log_folder(settings.last_date)
+    log_folder = get_log_folder(settings.last_date_object())
     processed_logs = db.get_processed_logs(log_folder)
-    done_log_filenames = [f.file_name for f in processed_logs]
-    files_to_process = [f.filename for f in cloudstorage_bucket.list_blobs(prefix=folder, delimiter='/')
-                        if _get_filename(f.filename) not in done_log_filenames]
+    done_log_filenames = [f for f in processed_logs]
+    files_to_process = [f.name for f in cloudstorage_bucket.list_blobs(prefix=get_log_folder(settings.last_date_object()))
+                        if _get_filename(f.name) not in done_log_filenames]
+    logging.warning('files_to_process: %s', files_to_process)
     for file_path in files_to_process:
         yield file_path
     now = datetime.now()
     current_hour_date = datetime(year=now.year, month=now.month, day=now.day, hour=now.hour)
-    if current_hour_date > settings.last_date:
-        next_date = _get_next_date(cloudstorage_bucket, settings.last_date)
+    if current_hour_date > settings.last_date_object():
+        next_date = _get_next_date(cloudstorage_bucket, settings.last_date_object())
         if not next_date:
             logging.info('No new logs to process yet.')
-        elif next_date != settings.last_date:
-            logging.info('Setting next date for log parsing from %s to %s', settings.last_date, next_date)
-            settings.last_date = next_date
+        elif next_date != settings.last_date_object():
+            logging.info('Setting next date for log parsing from %s to %s', settings.last_date_object(), next_date)
+            settings.last_date = str(next_date)
             db.save_settings(settings)
 
 
@@ -112,13 +112,14 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
         logging.warning('File %s already processed, doing nothing', bucket_path)
         return
     to_save = []
-    tmp = tempfile.NamedTemporaryFile('r+', delete=True)
-    try:
-        logging.info('Downloading %s', bucket_path)
-        cloudstorage_bucket.get_blob(bucket_path, chunk_size=1024 * 1024 * 10).download_to_file(tmp)
+    logging.info('Downloading %s', bucket_path)
+    blob = Blob(bucket_path, cloudstorage_bucket)
+    with tempfile.NamedTemporaryFile(delete=True) as file_obj:
+        blob.download_to_file(file_obj)
         logging.info('Processing %s', bucket_path)
+        file_obj.seek(0)
         while True:
-            line = tmp.readline()
+            line = file_obj.readline().decode("utf-8")
             if not line:
                 if to_save:
                     save_statistic_entries(influxdb_client, to_save)
@@ -128,8 +129,7 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
             if line_number % 1000 == 0:
                 logging.info('Processing line %s', line_number)
             to_save.extend(flatten(analyze(line)))
+            
             if len(to_save) > MAX_DB_ENTRIES_PER_RPC:
                 save_statistic_entries(influxdb_client, to_save[:MAX_DB_ENTRIES_PER_RPC])
                 to_save = to_save[MAX_DB_ENTRIES_PER_RPC:]
-    finally:
-        tmp.close()  # deletes the file

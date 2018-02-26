@@ -21,6 +21,11 @@ class LogParserSettings(object):
     def __init__(self, last_date: datetime) -> None:
         self.last_date = last_date
 
+    def last_date_object(self) -> datetime:
+        if not self.last_date:
+            return None
+        return datetime.strptime(self.last_date, '%Y-%m-%d %H:%M:%S')
+
 
 class LogFile(object):
     def __init__(self, folder_name: str, file_name: str) -> None:

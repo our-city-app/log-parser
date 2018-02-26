@@ -147,7 +147,7 @@ def app(value: dict) -> Iterator[Any]:
         app = 'unknown'
     for r in request_data.get('r', []):
         if r.get('item', {}).get('r'):
-            if r['item']['r'].keys == ['received_timestamp']:
+            if r['item']['r'].keys() == ['received_timestamp']:
                 yield {
                     'measurement': Measurements.MESSAGES,
                     'tags': {
@@ -190,7 +190,7 @@ def api(value: dict) -> Iterator[Any]:
 
 @lru_cache(maxsize=1000)
 def _get_app_id_by_service_hash(service_hash: str) -> Union[str, None]:
-    qry_string = urllib.urlencode({'user': service_hash})
+    qry_string = urllib.parse.urlencode({'user': service_hash})
     res = urllib.request.urlopen('https://rogerth.at/unauthenticated/service-app?' + qry_string)
     rbody = res.read()
     rcode = res.code

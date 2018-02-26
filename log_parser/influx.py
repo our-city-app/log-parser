@@ -22,8 +22,8 @@ from log_parser.config import LogParserConfig
 def get_client(config: LogParserConfig) -> InfluxDBClient:
     return InfluxDBClient(host=config.influxdb.host,
                           port=config.influxdb.port,
-                          ssl=config.debug,
-                          verify_ssl=config.debug,
+                          ssl=not config.debug,
+                          verify_ssl=not config.debug,
                           database=config.influxdb.db,
                           username=config.influxdb.username,
                           password=config.influxdb.password)

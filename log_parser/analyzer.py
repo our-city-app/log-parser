@@ -14,9 +14,10 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
+
 import io
 from typing import Any, Iterator
-
+import logging
 import ijson
 
 from log_parser.parsers import request_log, rogerthat
@@ -88,5 +89,5 @@ def analyze(line: str) -> Iterator[Any]:
         pass
     finally:
         f.close()
-    for func, reader in readers.iteritems():
+    for func, reader in readers.items():
         yield func(reader[0])

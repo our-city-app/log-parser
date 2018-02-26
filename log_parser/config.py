@@ -20,7 +20,7 @@ class InfluxConfig(object):
     def __init__(self, config: dict) -> None:
         self.host = config.get('host')  # type: str
         self.port = config.get('port')  # type: int
-        self.db = config.get('host')  # type: str
+        self.db = config.get('db')  # type: str
         self.username = config.get('username')  # type: str
         self.password = config.get('password')  # type: str
 
