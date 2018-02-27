@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -eufx pipefail
+cd "$(dirname "$0")"
 function clean {
   find ./monitoring/backup/influxdb -mindepth 1 -delete
   rm -f ./monitoring/backup/grafana.db
@@ -25,7 +26,7 @@ function upload {
     echo "No google credentials file present in location ${credentials_file}"
     exit 1
   fi
-  docker-compose up --build backup
+  /usr/local/bin/docker-compose up --build backup
 }
 
 clean
