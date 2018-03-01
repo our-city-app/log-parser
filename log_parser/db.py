@@ -16,6 +16,7 @@
 # @@license_version:1.4@@
 
 import json
+import logging
 import os
 import typing
 from datetime import datetime
@@ -54,7 +55,7 @@ class DatabaseConnection(object):
             f.write(json.dumps({'last_date': settings.last_date.isoformat()}))
         return settings
 
-    def get_processed_logs(self, log_folder: str) -> typing.List[LogFile]:
+    def get_processed_logs(self, log_folder: str) -> typing.List[str]:
         """Returns a list of filenames"""
         year = log_folder.split('-')[0]
         create_folder(os.path.join(self.root_dir, year))
@@ -68,6 +69,7 @@ class DatabaseConnection(object):
         create_folder(os.path.join(self.root_dir, year, log_folder))
         f_path = os.path.join(self.root_dir, year, log_folder, file_name)
         touch(f_path)
+        logging.debug('Saved processed file %s', f_path)
 
     def get_processed_log(self, log_folder: str, file_name: str) -> typing.Union[LogFile, None]:
         year = log_folder.split('-')[0]

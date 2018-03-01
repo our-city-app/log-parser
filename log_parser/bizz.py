@@ -69,7 +69,6 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -
     log_folder = get_log_folder(settings.last_date)
     done_log_filenames = db.get_processed_logs(log_folder)
     gcs_files = cloudstorage_bucket.list_blobs(prefix=log_folder)
-    logging.info('Done logs: %s, gcs files: %s', done_log_filenames, gcs_files)
     for file_ in gcs_files:
         if _get_filename(file_.name) not in done_log_filenames:
             yield file_.name
