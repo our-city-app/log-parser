@@ -69,7 +69,6 @@ class DatabaseConnection(object):
         create_folder(os.path.join(self.root_dir, year, log_folder))
         f_path = os.path.join(self.root_dir, year, log_folder, file_name)
         touch(f_path)
-        logging.debug('Saved processed file %s', f_path)
 
     def get_processed_log(self, log_folder: str, file_name: str) -> typing.Union[LogFile, None]:
         year = log_folder.split('-')[0]

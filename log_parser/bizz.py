@@ -117,18 +117,14 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
         blob.download_to_file(file_obj)
         logging.info('Processing %s', bucket_path)
         file_obj.seek(0)
-        while True:
-            line = file_obj.readline().decode("utf-8")
-            if not line:
-                if to_save:
-                    save_statistic_entries(influxdb_client, to_save)
-                db.save_processed_file(_get_foldername(bucket_path), _get_filename(bucket_path))
-                break
+        for line in file_obj:
             line_number += 1
             if line_number % 1000 == 0:
                 logging.info('Processing line %s of %s', line_number, bucket_path)
-            to_save.extend(flatten(analyze(line)))
-            
+            to_save.extend(flatten(analyze(line.decode('utf-8'))))
             if len(to_save) > MAX_DB_ENTRIES_PER_RPC:
                 save_statistic_entries(influxdb_client, to_save[:MAX_DB_ENTRIES_PER_RPC])
                 to_save = to_save[MAX_DB_ENTRIES_PER_RPC:]
+        if to_save:
+            save_statistic_entries(influxdb_client, to_save)
+        db.save_processed_file(_get_foldername(bucket_path), _get_filename(bucket_path))
