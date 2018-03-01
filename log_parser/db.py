@@ -55,6 +55,7 @@ class DatabaseConnection(object):
         return settings
 
     def get_processed_logs(self, log_folder: str) -> typing.List[LogFile]:
+        """Returns a list of filenames"""
         year = log_folder.split('-')[0]
         create_folder(os.path.join(self.root_dir, year))
         f_path = os.path.join(self.root_dir, year, log_folder)

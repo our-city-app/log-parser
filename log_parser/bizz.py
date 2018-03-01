@@ -67,12 +67,12 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -
         settings.last_date = _get_next_date(cloudstorage_bucket)
         db.save_settings(settings)
     log_folder = get_log_folder(settings.last_date)
-    processed_logs = db.get_processed_logs(log_folder)
-    done_log_filenames = [f for f in processed_logs]
-    files_to_process = [f.name for f in cloudstorage_bucket.list_blobs(prefix=log_folder)
-                        if _get_filename(f.name) not in done_log_filenames]
-    for file_path in files_to_process:
-        yield file_path
+    done_log_filenames = db.get_processed_logs(log_folder)
+    gcs_files = cloudstorage_bucket.list_blobs(prefix=log_folder)
+    logging.info('Done logs: %s, gcs files: %s', done_log_filenames, gcs_files)
+    for file_ in gcs_files:
+        if _get_filename(file_.name) not in done_log_filenames:
+            yield file_.name
     now = datetime.now()
     current_hour_date = datetime(year=now.year, month=now.month, day=now.day, hour=now.hour)
     if current_hour_date > settings.last_date:
