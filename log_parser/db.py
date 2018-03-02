@@ -16,7 +16,6 @@
 # @@license_version:1.4@@
 
 import json
-import logging
 import os
 import typing
 from datetime import datetime
@@ -54,6 +53,16 @@ class DatabaseConnection(object):
         with open(f_path, 'w') as f:
             f.write(json.dumps({'last_date': settings.last_date.isoformat()}))
         return settings
+
+    def get_all_processed_logs(self, year: str) -> typing.List[str]:
+        all_dirs = []
+        year_folder_path = os.path.join(self.root_dir, year)
+        if not os.path.exists(year_folder_path):
+            return []
+        for directory in os.listdir(year_folder_path):
+            all_dirs.extend(['%s/%s' % (directory, filename) for filename in
+                             os.listdir(os.path.join(self.root_dir, year, directory))])
+        return all_dirs
 
     def get_processed_logs(self, log_folder: str) -> typing.List[str]:
         """Returns a list of filenames"""

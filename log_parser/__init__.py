@@ -65,14 +65,16 @@ def main(process_count: int):
     db = DatabaseConnection(os.path.join(CURRENT_DIR, '..', 'parser'))
     cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
     influxdb_client = get_client(configuration)
+    queue = set()
     while True:
-        iterable = list(start_processing_logs(db, cloudstorage_bucket))
-        if len(iterable) == 0:
+        new_files = [f for f in start_processing_logs(db, cloudstorage_bucket) if f not in queue]
+        if len(new_files) == 0:
             logging.info('Nothing to process, sleeping %s seconds.', configuration.interval)
             time.sleep(configuration.interval)
             continue
-        logging.info('Processing %s files', len(iterable))
-        for file_name in iterable:
+        logging.info('Processing %s files', len(new_files))
+        for file_name in new_files:
+            queue.add(file_name)
             if configuration.debug:
                 process_file(file_name, db, influxdb_client, configuration)
             else:

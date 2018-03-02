@@ -27,7 +27,6 @@ from log_parser.analyzer import analyze
 from log_parser.db import DatabaseConnection
 
 MAX_DB_ENTRIES_PER_RPC = 5000
-LOG_PARSING_QUEUE = 'log-parsing'
 
 
 def _get_foldername(file_path) -> str:
@@ -60,28 +59,24 @@ def _get_next_date(cloudstorage_bucket: Bucket, min_date: datetime = None) -> Op
         return None
 
 
-def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -> Iterator[str]:
+def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket):
+    # Returns all log files for a whole year
     settings = db.get_settings()
     logging.info('Starting processing logs from %s', settings.last_date)
     if not settings.last_date:
         settings.last_date = _get_next_date(cloudstorage_bucket)
         db.save_settings(settings)
-    log_folder = get_log_folder(settings.last_date)
-    done_log_filenames = db.get_processed_logs(log_folder)
-    gcs_files = cloudstorage_bucket.list_blobs(prefix=log_folder)
-    for file_ in gcs_files:
-        if _get_filename(file_.name) not in done_log_filenames:
-            yield file_.name
-    now = datetime.now()
-    current_hour_date = datetime(year=now.year, month=now.month, day=now.day, hour=now.hour)
-    if current_hour_date > settings.last_date:
-        next_date = _get_next_date(cloudstorage_bucket, settings.last_date)
-        if not next_date:
-            logging.info('No new logs to process yet.')
-        elif next_date != settings.last_date:
-            logging.info('Setting next date for log parsing from %s to %s', settings.last_date, next_date)
-            settings.last_date = next_date
-            db.save_settings(settings)
+    year_str = str(settings.last_date.year)
+    done_log_filenames = db.get_all_processed_logs(year_str)
+    files = sorted(filter(lambda f: f not in done_log_filenames,
+                          map(lambda b: b.name, cloudstorage_bucket.list_blobs(prefix=year_str))))
+    min_date = datetime.strptime((files[-1]).split('/')[0], '%Y-%m-%d %H:%M:%S')
+    next_date = _get_next_date(cloudstorage_bucket, min_date) or min_date
+    if next_date != settings.last_date:
+        settings.last_date = next_date
+        logging.info('Saving next date as %s', settings.last_date)
+        db.save_settings(settings)
+    return files
 
 
 def save_statistic_entries(client, entries) -> bool:
@@ -119,7 +114,7 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
         file_obj.seek(0)
         for line in file_obj:
             line_number += 1
-            if line_number % 1000 == 0:
+            if line_number % 5000 == 0:
                 logging.info('Processing line %s of %s', line_number, bucket_path)
             to_save.extend(flatten(analyze(line.decode('utf-8'))))
             if len(to_save) > MAX_DB_ENTRIES_PER_RPC:
