@@ -1,0 +1,34 @@
+{
+  "timestamp": 1520319844.2402201,
+  "request_data": {
+    "callback_name": null,
+    "params": {
+      "timestamp": 1520319842,
+      "user_details": [
+        {
+          "public_key": null,
+          "name": "Example User",
+          "language": "nl_BE",
+          "app_id": "rogerthat",
+          "avatar_url": "https://rogerth.at/unauthenticated/mobi/cached/avatar/1",
+          "public_keys": [],
+          "email": "dbbc2dc7833c09339e1dc9e2d34f46da"
+        }
+      ],
+      "service_identity": "+default+",
+      "tag": "__sln__.sandwich_bar",
+      "context": "MENU_fa131d4c-4de3-4ba7-ae43-8f96851c7e70",
+      "result_key": "_js_cab23a6-ce5e-2933-476b-42a72607ca7e",
+      "email": "dbbc2dc7833c09339e1dc9e2d34f46da"
+    },
+    "method": "messaging.poke",
+    "id": "8de241b5-210c-11e8-8f4e-85cd806aed17"
+  },
+  "type": "callback_api",
+  "response_data": {
+    "error": null,
+    "result": null,
+    "id": "8de241b5-210c-11e8-8f4e-85cd806aed17"
+  },
+  "user": "test@example.be"
+}

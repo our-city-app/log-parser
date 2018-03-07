@@ -1,0 +1,125 @@
+{
+  "function": "messaging.flow_member_result",
+  "status": true,
+  "request_data": {
+    "callback_name": null,
+    "params": {
+      "end_id": "end_done",
+      "flush_id": "results_flush",
+      "timestamp": 1520320085,
+      "service_identity": "+default+",
+      "end_message_flow_id": null,
+      "message_flow_run_id": "_js_63fb6ff9-6cfc-37ce-3d13-afb19e644be2",
+      "member": "dabc2dc7833c09339e1dc9e2d34f46da",
+      "parent_message_key": "_js_42817672-c909-d645-4c0c-98a1bee019ff",
+      "tag": "__sln__.sandwich_bar",
+      "steps": [
+        {
+          "received_timestamp": 1520320008,
+          "message_flow_id": null,
+          "button": "Volgende",
+          "step_type": "form_step",
+          "display_value": "Bruin broodje",
+          "form_type": "single_select",
+          "step_id": "message_type",
+          "message": "*****",
+          "answer_id": "positive",
+          "form_result": {
+            "type": "unicode_result",
+            "result": {
+              "value": "type_5144752345317376"
+            }
+          },
+          "acknowledged_timestamp": 1520320049
+        },
+        {
+          "received_timestamp": 1520320050,
+          "message_flow_id": null,
+          "button": "Volgende",
+          "step_type": "form_step",
+          "display_value": "Martino (\u20ac3.00)",
+          "form_type": "single_select",
+          "step_id": "message_topping",
+          "message": "*****",
+          "answer_id": "positive",
+          "form_result": {
+            "type": "unicode_result",
+            "result": {
+              "value": "topping_5685265389584384"
+            }
+          },
+          "acknowledged_timestamp": 1520320077
+        },
+        {
+          "received_timestamp": 1520320078,
+          "message_flow_id": null,
+          "button": "Volgende",
+          "step_type": "form_step",
+          "display_value": "",
+          "form_type": "multi_select",
+          "step_id": "message_customize",
+          "message": "*****",
+          "answer_id": "positive",
+          "form_result": {
+            "type": "unicode_list_result",
+            "result": {
+              "values": []
+            }
+          },
+          "acknowledged_timestamp": 1520320079
+        },
+        {
+          "received_timestamp": 1520320080,
+          "message_flow_id": null,
+          "button": "Bestellen",
+          "step_type": "form_step",
+          "display_value": "",
+          "form_type": "text_block",
+          "step_id": "message_remark",
+          "message": "*****",
+          "answer_id": "positive",
+          "form_result": {
+            "type": "unicode_result",
+            "result": {
+              "value": ""
+            }
+          },
+          "acknowledged_timestamp": 1520320084
+        }
+      ],
+      "flush_message_flow_id": null,
+      "result_key": "25a902f9-55f8-4c2e-802a-2f13ce501949",
+      "flow_params": null,
+      "user_details": [
+        {
+          "public_key": null,
+          "name": "Sample user",
+          "language": "nl_BE",
+          "app_id": "be-loc",
+          "avatar_url": "https://rogerth.at/unauthenticated/mobi/cached/avatar/1",
+          "public_keys": [],
+          "email": "xxxxx"
+        }
+      ]
+    },
+    "method": "messaging.flow_member_result",
+    "id": "1d42fb78-210d-11e8-b625-179e34d34cbe"
+  },
+  "timestamp": 1520320084.98068,
+  "response_data": {
+    "type": "message",
+    "value": {
+      "alert_flags": 1,
+      "branding": "20C55543751DB38A69AE385013962C336C09A5E8FE15DA2F0121F8D48498D364",
+      "tag": null,
+      "answers": [],
+      "dismiss_button_ui_flags": 0,
+      "flags": 65,
+      "step_id": "message_sandwich_ordered",
+      "message": "*****",
+      "attachments": []
+    }
+  },
+  "type": "callback_api",
+  "user": "sample-service@rogerth.at"
+}

@@ -16,38 +16,57 @@
 # @@license_version:1.4@@
 
 import io
-from typing import Any, Iterator
+import logging
+from typing import Iterator, Dict, Any, List, Union
 
 import ijson
 
-from log_parser.parsers import request_log, rogerthat
+from log_parser.parsers import request_log, rogerthat, threefold
 from log_parser.parsers.filter import registry, request_filter
-
-OTHER = object()
-
-request_calls = []
 
 log_types = {
     '_request': request_log.process,
     'callback_api': rogerthat.callback_api,
     'api': rogerthat.api,
-    'app': rogerthat.app
+    'app': rogerthat.app,
+    'web': rogerthat.web,
+    'web_channel': rogerthat.web_channel,
+    'tf.web': threefold.web
 }
 
 
 @request_filter('')
-def process_log(value: dict) -> Iterator[Any]:
+def process_log(value: dict) -> Iterator[dict]:
     type_ = value.get('type')
+    if not type_:
+        type_ = guess_log_type(value)
     f = log_types.get(type_)
-    return f and f(value)
+    if f:
+        yield from f(value)
+    elif not type_:
+        pass
+    else:
+        logging.warning('Unsupported log type %s for line %s', type_, value)
+        yield from ()
 
 
-def analyze(line: str) -> Iterator[Any]:
-    readers = {}
+def guess_log_type(value: dict) -> Union[None, str]:
+    result = None
+    request_data = value.get('request_data', {})
+    if 'params' in request_data:
+        result = 'callback_api'
+    elif 'a' in request_data:
+        result = 'app'
+    return result
+
+
+def analyze(line: str) -> Iterator[dict]:
+    readers: Any = {}  # too complicated for proper types
     f = io.StringIO(line)
+    data: Union[Dict, List]
     try:
         for key, type_, value in ijson.parse(f):
-            listeners = registry.get(key, OTHER)
+            listeners = registry.get(key, [])
             for reader in readers.values():
                 _, stack, property_name = reader
                 parent = stack[-1]
@@ -77,17 +96,17 @@ def analyze(line: str) -> Iterator[Any]:
                     parent[property_name] = value
                 else:
                     parent.append(value)
-            if listeners != OTHER:
-                for func in listeners:
-                    if type_ == 'start_map':
-                        # Start reading
-                        data = {}
-                        readers[func] = [data, [data], None]
-                    elif type_ == 'end_map':
-                        yield func(readers.pop(func)[0])
+            for func in listeners:
+                if type_ == 'start_map':
+                    # Start reading
+                    initial_data: Dict = {}
+                    readers[func] = [initial_data, [initial_data], None]
+                elif type_ == 'end_map':
+                    yield from func(readers.pop(func)[0])
     except (ijson.common.IncompleteJSONError, ijson.backends.python.UnexpectedSymbol):
         pass
     finally:
         f.close()
     for func, reader in readers.items():
-        yield func(reader[0])
+        for result in func(reader[0]):
+            yield result

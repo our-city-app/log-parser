@@ -1,0 +1,138 @@
+{
+  "timestamp": 1520320437.4057,
+  "request_data": {
+    "a": [],
+    "c": [
+      {
+        "a": {
+          "request": {
+            "cursor": null,
+            "updated_since": 1520184620
+          }
+        },
+        "ci": "8e56323e-a2d4-4673-8e4d-9dcf3ec118da",
+        "av": 1,
+        "t": 1520320431,
+        "f": "com.mobicage.api.news.getNews"
+      }
+    ],
+    "r": [],
+    "av": 1
+  },
+  "type": "app",
+  "response_data": {
+    "c": [
+      {
+        "a": {
+          "request": {
+            "generation": 18,
+            "status": 2,
+            "friend": {
+              "descriptionBranding": "C20069BA73B6B18E643266F1AFC7AC8BEE1207B01700E3CE08A0D51AEC667AEF",
+              "broadcastFlowHash": "03b5cbb12733afcdac76113e949b9750",
+              "pokeDescription": null,
+              "sharesContacts": false,
+              "existence": 0,
+              "avatarId": 4997939613138944,
+              "organizationType": 3,
+              "shareLocation": false,
+              "hasUserData": false,
+              "qualifiedIdentifier": "a65cab11c4e14c4ff9036e8b34836c9e",
+              "avatarHash": "E39AB834802797F0BA416D6A529F8DB959E0BB020CAA702C2C7B6B5A84F7C63E",
+              "generation": 538,
+              "actionMenu": {
+                "shareLinkUrl": "https://rogerth.at/M/C22ALHTI2.?email",
+                "shareCaption": "Scan QR code om te ontdekken!",
+                "shareImageUrl": "https://rogerth.at/si/ncj2Sacyp7lPOBw_0LcAdo6eeqzgYfJrn4A6fDIedDw-/5629499534213120",
+                "branding": "C20069BA73B6B18E643266F1AFC7AC8BEE1207B01700E3CE08A0D51AEC667AEF",
+                "shareLabel": "Aanbevelen",
+                "share": false,
+                "callConfirmation": "",
+                "callLabel": "Bellen",
+                "phoneNumber": "+32 56 68 81 14",
+                "aboutLabel": "Info",
+                "items": [
+                  {
+                    "screenBranding": null,
+                    "roles": [],
+                    "iconName": "fa-comments-o",
+                    "iconHash": "be72e36256878958e7fd669ab3ff7aff",
+                    "fallThrough": false,
+                    "label": "Stel een vraag",
+                    "coords": [
+                      1,
+                      1,
+                      0
+                    ],
+                    "iconColor": null,
+                    "action": 0,
+                    "hashedTag": "72c7e7d96318c0b490332fdf6850351f95d643d459b3eb9cf5f3ebe87e860c59",
+                    "staticFlowHash": "0205c3a5f1b8da48e3d3a59003d3bad1",
+                    "runInBackground": true,
+                    "link": null,
+                    "requiresWifi": false
+                  },
+                  {
+                    "screenBranding": "D8CBDB28A6FC2967D723CA29CD9E99DF0C2E8A6F9030CED80902E49278605350",
+                    "roles": [],
+                    "iconName": "fa-home",
+                    "iconHash": "70e23dd120b5b3e53be7bb8725e4d3e5",
+                    "fallThrough": false,
+                    "label": "Gemeenteraad",
+                    "coords": [
+                      1,
+                      2,
+                      0
+                    ],
+                    "iconColor": null,
+                    "action": 0,
+                    "hashedTag": "709debbc5a5a88f72619115c2d7409364dcc2818f1803e42a0dd1cf845990b95",
+                    "staticFlowHash": null,
+                    "runInBackground": true,
+                    "link": null,
+                    "requiresWifi": false
+                  }
+                ],
+                "staticFlowBrandings": [
+                  "DF2A55C543AE2BD2438373BCF0AC0747670F145367C925F75154498B98845085",
+                  "C20069BA73B6B18E643266F1AFC7AC8BEE1207B01700E3CE08A0D51AEC667AEF"
+                ],
+                "messagesLabel": "Historiek",
+                "shareDescription": "*****"
+              },
+              "type": 2,
+              "email": "6a86feb8429a26390d85baaa8764df86",
+              "userData": null,
+              "description": "*****",
+              "callbacks": 1048575,
+              "contentBrandingHash": null,
+              "sharesLocation": false,
+              "name": "Wortegem-Petegem",
+              "appData": null,
+              "versions": [
+                358,
+                882,
+                8
+              ],
+              "profileData": null,
+              "flags": 1,
+              "homeBrandingHash": null,
+              "category_id": null
+            }
+          }
+        },
+        "ci": "bb09d5e3-20e9-11e8-a4d8-5529e070c50c",
+        "f": "com.mobicage.capi.friends.updateFriend",
+        "t": 1520304887,
+        "av": 1
+      },
+      {
+        "a": {
+          "request": {
+            "service": "service-92cb75e1-2534-41bb-8326-33d8eb992378@rogerth.at",
+            "keys": [],
+            "type": "app",
+            "user_data": null,
+            "app_data": null,
+            "values": [],
+            "data": "long data that has been truncated ...(length 43740)

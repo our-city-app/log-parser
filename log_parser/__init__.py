@@ -21,6 +21,7 @@ import logging
 import os
 import time
 from multiprocessing.pool import Pool
+from typing import Set
 
 from google.cloud import storage
 from influxdb import InfluxDBClient
@@ -65,7 +66,7 @@ def main(process_count: int):
     db = DatabaseConnection(os.path.join(CURRENT_DIR, '..', 'parser'))
     cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
     influxdb_client = get_client(configuration)
-    queue = set()
+    queue: Set[str] = set()
     while True:
         new_files = [f for f in start_processing_logs(db, cloudstorage_bucket) if f not in queue]
         if len(new_files) == 0:

@@ -16,9 +16,8 @@
 # @@license_version:1.4@@
 import logging
 import tempfile
-import types
 from datetime import datetime
-from typing import Optional, Iterator, List, Union, Dict
+from typing import Optional, List
 
 from google.cloud.storage import Bucket, Blob
 from influxdb import InfluxDBClient
@@ -84,17 +83,6 @@ def save_statistic_entries(client, entries) -> bool:
     return client.write_points(entries, batch_size=MAX_DB_ENTRIES_PER_RPC)
 
 
-def flatten(l: Union[Iterator[Dict], Iterator[Iterator[Dict]]]) -> Iterator[Dict]:
-    for sublist in l:
-        if sublist:
-            if isinstance(sublist, types.GeneratorType):
-                for item in sublist:
-                    if item:
-                        yield item
-            elif isinstance(sublist, dict):
-                yield sublist
-
-
 def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, cloudstorage_bucket: Bucket,
                  bucket_path: str):
     date = _get_date_from_filename(bucket_path)
@@ -116,7 +104,10 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
             line_number += 1
             if line_number % 5000 == 0:
                 logging.info('Processing line %s of %s', line_number, bucket_path)
-            to_save.extend(flatten(analyze(line.decode('utf-8'))))
+            try:
+                to_save.extend(analyze(line.decode('utf-8')))
+            except Exception:
+                logging.exception('Could not process line %s', line)
             if len(to_save) > MAX_DB_ENTRIES_PER_RPC:
                 save_statistic_entries(influxdb_client, to_save[:MAX_DB_ENTRIES_PER_RPC])
                 to_save = to_save[MAX_DB_ENTRIES_PER_RPC:]

@@ -14,15 +14,8 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
-from collections import defaultdict
-from types import FunctionType
-from typing import Dict, List
-
-registry: Dict[str, List[FunctionType]] = defaultdict(list)
+from typing import Iterator
 
 
-def request_filter(key):
-    def wrap(func):
-        registry[key].append(func)
-    return wrap
-
+def web(value: dict) -> Iterator[dict]:
+    yield from []

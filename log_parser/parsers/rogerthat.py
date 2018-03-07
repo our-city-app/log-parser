@@ -16,12 +16,17 @@
 # @@license_version:1.4@@
 import json
 import re
-import urllib
 from datetime import datetime
 from functools import lru_cache
 from typing import Union, Iterator, Any
 
-HUMAN_READABLE_TAG_REGEX = re.compile('(.*?)\\s*\\{.*\\}')
+import certifi
+import urllib3
+
+HUMAN_READABLE_TAG_REGEX = re.compile('(.*?)\\s*{.*\\}')
+UNKNOWN = 'unknown'
+
+poolmngr = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 
 class Measurements(object):
@@ -59,8 +64,8 @@ def callback_api(value: dict) -> Iterator[Any]:
     function_type = value.get('function') or request_data.get('method')
     timestamp = _get_time(value)
     params = request_data.get('params', {})
-    user_email = 'unknown'
-    app_id = 'unknown'
+    user_email = UNKNOWN
+    app_id = UNKNOWN
     tag = parse_to_human_readable_tag(params.get('tag'))
     if params.get('user_details'):
         if isinstance(params['user_details'], list):
@@ -69,40 +74,40 @@ def callback_api(value: dict) -> Iterator[Any]:
             user_details = params['user_details']
         app_id = user_details['app_id']
         user_email = user_details['email']
-    if tag and not tag.startswith('{'):
-        if function_type == 'messaging.flow_member_result':
-            fields = {
-                'parent_message_key': params.get('parent_message_key')
-            }
-            if params.get('steps'):
-                fields['last_step_id'] = params['steps'][-1]['step_id']
-            yield {
-                'measurement': Measurements.FLOW_MEMBER_RESULTS,
-                'tags': {
-                    'method': request_data.get('method'),
-                    'tag': tag,
-                    'flush_id': params.get('flush_id'),
-                    'end_id': params.get('end_id'),
-                    'app': app_id,
-                    'service': value.get('user')
-                },
-                'time': timestamp,
-                'fields': fields
-            }
-        else:
-            yield {
-                'measurement': Measurements.CALLBACK_API,
-                'tags': {
-                    'tag': parse_to_human_readable_tag(params.get('tag')),
-                    'app': app_id,
-                    'method': params.get('method'),
-                    'service': value.get('user')
-                },
-                'time': timestamp,
-                'fields': {
-                    'user': user_email
-                }
-            }
+    if tag and tag.startswith('{'):
+        tag = None
+    if function_type == 'messaging.flow_member_result':
+        fields = {
+            'parent_message_key': params.get('parent_message_key')
+        }
+        if params.get('steps'):
+            fields['last_step_id'] = params['steps'][-1]['step_id']
+        yield {
+            'measurement': Measurements.FLOW_MEMBER_RESULTS,
+            'tags': {
+                'method': request_data.get('method'),
+                'tag': tag,
+                'flush_id': params.get('flush_id'),
+                'end_id': params.get('end_id'),
+                'app': app_id,
+                'service': value.get('user')
+            },
+            'time': timestamp,
+            'fields': fields
+        }
+    yield {
+        'measurement': Measurements.CALLBACK_API,
+        'tags': {
+            'tag': tag,
+            'app': app_id,
+            'method': params.get('method'),
+            'service': value.get('user')
+        },
+        'time': timestamp,
+        'fields': {
+            'user': user_email
+        }
+    }
 
 
 def app(value: dict) -> Iterator[Any]:
@@ -139,22 +144,21 @@ def app(value: dict) -> Iterator[Any]:
     #   "user": "c356f0adc203397a9d89ff9e1a6e6b54:em-be-idola"
     # }
     request_data = value.get('request_data', {})
-    UNKNOWN = 'unknown'
     user = value.get('user', UNKNOWN)
     if ':' in user:
-        user, app = user.split(':', 1)
+        user, app_id = user.split(':', 1)
     elif user:
-        app = 'rogerthat'
+        app_id = 'rogerthat'
     else:
-        app = UNKNOWN
+        app_id = UNKNOWN
     # Results
-    for r in request_data.get('r', []):
-        if r.get('item', {}).get('r'):
-            if r['item']['r'].keys() == ['received_timestamp']:
+    for request in request_data.get('r', []):
+        if request.get('item', {}).get('r'):
+            if request['item']['r'].keys() == ['received_timestamp']:
                 yield {
                     'measurement': Measurements.MESSAGES,
                     'tags': {
-                        'app': app,
+                        'app': app_id,
                     },
                     'time': _get_time(value),
                     'fields': {
@@ -167,7 +171,7 @@ def app(value: dict) -> Iterator[Any]:
             yield {
                 'measurement': Measurements.CLIENT_CALL,
                 'tags': {
-                    'app': app,
+                    'app': app_id,
                     'type': call.get('f', UNKNOWN)
                 },
                 'time': datetime.utcfromtimestamp(call['t']).isoformat() + 'Z',
@@ -205,12 +209,21 @@ def api(value: dict) -> Iterator[Any]:
     }
 
 
+def web(value: dict) -> Iterator[dict]:
+    # We actually don't care for this
+    yield from []
+
+
+def web_channel(value: dict) -> Iterator[dict]:
+    # We actually don't care for this
+    yield from []
+
+
 @lru_cache(maxsize=1000)
 def _get_app_id_by_service_hash(service_hash: str) -> Union[str, None]:
-    qry_string = urllib.parse.urlencode({'user': service_hash})
-    res = urllib.request.urlopen('https://rogerth.at/unauthenticated/service-app?' + qry_string)
-    rbody = res.read()
-    rcode = res.code
-    if rcode != 200:
+    url = 'https://rogerth.at/unauthenticated/service-app'
+    fields = {'user': service_hash}
+    res = poolmngr.request('GET', url, fields)  # type: urllib3.HTTPResponse
+    if res.status != 200:
         raise Exception('Failed to get app_id for service hash %s', service_hash)
-    return json.loads(rbody)['app_id']
+    return json.loads(res.data)['app_id']

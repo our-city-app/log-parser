@@ -1,0 +1,98 @@
+{
+  "timestamp": 1520320438.97837,
+  "request_data": {
+    "a": [],
+    "c": [
+      {
+        "a": {
+          "request": {
+            "cursor": null,
+            "updated_since": 1520317589
+          }
+        },
+        "ci": "6954836d-451c-49c2-9e0e-c60c45923d3f",
+        "av": 1,
+        "t": 1520320135,
+        "f": "com.mobicage.api.news.getNews"
+      },
+      {
+        "a": {
+          "request": {
+            "netCarrierName": "BASE",
+            "netCountryCode": null,
+            "minorVersion": 3857,
+            "appType": 4,
+            "SDKVersion": "26",
+            "timezoneDeltaGMT": 3600,
+            "timezone": "Europe/Brussels",
+            "localeLanguage": "nl",
+            "embeddedApps": [],
+            "simCountry": "be",
+            "netCountry": "be",
+            "majorVersion": 1,
+            "product": "Sint-Truiden Android",
+            "netCarrierCode": "00000",
+            "timestamp": 1520320135,
+            "simCarrierCode": "00000",
+            "deviceId": "00000000000",
+            "simCountryCode": null,
+            "deviceModelName": "Sample device",
+            "localeCountry": "BE",
+            "simCarrierName": "Sample Carier",
+            "flushBackLog": false,
+            "buildFingerPrint": "sample-build-fingerprint",
+            "networkState": "[type: WIFI[], state: DISCONNECTED/BLOCKED, reason: (unspecified), extra: (none), failover: false, available: true, roaming: false, metered: false]\n[type: MOBILE[LTE], state: DISCONNECTED/BLOCKED, reason: (unspecified), extra: (none), failover: false, available: true, roaming: false, metered: true]\n"
+          }
+        },
+        "ci": "aeee1ed4-80d6-41bc-b1c7-7ca76397c40d",
+        "av": 1,
+        "t": 1520320135,
+        "f": "com.mobicage.api.system.heartBeat"
+      }
+    ],
+    "r": [],
+    "av": 1
+  },
+  "type": "app",
+  "response_data": {
+    "c": [
+      {
+        "a": {
+          "request": {
+            "look_and_feel": null
+          }
+        },
+        "ci": "f081f4a6-210d-11e8-81db-a900afee5164",
+        "f": "com.mobicage.capi.system.updateLookAndFeel",
+        "t": 1520320438,
+        "av": 1
+      }
+    ],
+    "ap": "https://rogerthat-server.appspot.com/json-rpc",
+    "r": [
+      {
+        "s": "success",
+        "r": {
+          "cursor": null,
+          "result": []
+        },
+        "av": 1,
+        "ci": "6954836d-451c-49c2-9e0e-c60c45923d3f",
+        "t": 1520320135
+      },
+      {
+        "s": "success",
+        "r": {
+          "systemTime": 1520320436
+        },
+        "av": 1,
+        "ci": "aeee1ed4-80d6-41bc-b1c7-7ca76397c40d",
+        "t": 1520320135
+      }
+    ],
+    "t": 1520320438,
+    "av": 1,
+    "more": false
+  },
+  "user": "test@example.com:be-sint-truiden"
+}

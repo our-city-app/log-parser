@@ -1,0 +1,22 @@
+{
+  "timestamp": 1520320270.5609901,
+  "request_data": {
+    "callback_name": null,
+    "params": {
+      "origin": "user_invite",
+      "service_identity": "+default+",
+      "email": "xxxxxxxxx",
+      "tag": "{\"whatever\":true}",
+      "result": "accepted"
+    },
+    "method": "friend.invite_result",
+    "id": "8b9bca63-210d-11e8-814a-092c9bee4008"
+  },
+  "type": "callback_api",
+  "response_data": {
+    "error": null,
+    "result": null,
+    "id": "8b9bca63-210d-11e8-814a-092c9bee4008"
+  },
+  "user": "service-ae78a27b-dba9-4dc0-9f85-031208f9747c@rogerth.at"
+}

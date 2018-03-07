@@ -1,3 +1,4 @@
+urllib3[secure]
 google-cloud-storage
 influxdb
 ijson

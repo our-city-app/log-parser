@@ -1,0 +1,48 @@
+{
+  "function": "system.get_identity",
+  "status": true,
+  "request_data": {},
+  "timestamp": 1520323194.9946699,
+  "response_data": {
+    "description_branding": "XXXXXXXxx",
+    "beacons": [],
+    "app_ids_use_default": false,
+    "phone_call_popup_use_default": false,
+    "app_data": "*****",
+    "app_ids": [
+      "rogerthat"
+    ],
+    "app_names": [
+      "Rogerthat"
+    ],
+    "search_use_default": false,
+    "email_statistics": false,
+    "admin_emails": [],
+    "search_config": {
+      "keywords": "Sample keywords",
+      "enabled": true,
+      "locations": []
+    },
+    "home_branding_hash": null,
+    "recommend_enabled": true,
+    "phone_number": "0000000000000",
+    "description_use_default": false,
+    "description": "*****",
+    "can_edit_supported_apps": false,
+    "qualified_identifier": "111111111111111111",
+    "email_statistics_use_default": false,
+    "beacon_auto_invite": true,
+    "description_branding_use_default": false,
+    "menu_branding": "XXXXXXXxx",
+    "name": "Sample",
+    "created": 1519201874,
+    "phone_number_use_default": false,
+    "home_branding_use_default": false,
+    "phone_call_popup": null,
+    "content_branding_hash": null,
+    "identifier": "+default+",
+    "menu_branding_use_default": false
+  },
+  "type": "api",
+  "user": "service-xxxxxxxxxx@rogerth.at"
+}

@@ -1,0 +1,36 @@
+{
+  "timestamp": 1520323066.84865,
+  "request_data": {
+    "a": [],
+    "c": [],
+    "r": [],
+    "av": 1
+  },
+  "response_data": {
+    "ap": "https://rogerthat-server.appspot.com/json-rpc",
+    "c": [
+      {
+        "a": {
+          "request": {
+            "generation": 431,
+            "status": 2,
+            "friend": {
+              "content-truncated-for-tests": true
+            }
+          }
+        },
+        "ci": "e9dfe0c0-20ee-11e8-8e24-b378fde9c13d",
+        "f": "com.mobicage.capi.friends.updateFriend",
+        "t": 1520307113,
+        "av": 1
+      },
+      {
+        "a": {
+          "request": {
+            "service": "service-xxx@rogerth.at",
+            "keys": [],
+            "type": "app",
+            "user_data": null,
+            "app_data": null,
+            "values": [],
+            "data": "...(length 119514)
