@@ -21,6 +21,7 @@ from typing import Optional, List
 
 from google.cloud.storage import Bucket, Blob
 from influxdb import InfluxDBClient
+from influxdb.exceptions import InfluxDBClientError
 
 from log_parser.analyzer import analyze
 from log_parser.db import DatabaseConnection
@@ -80,7 +81,11 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket):
 
 def save_statistic_entries(client, entries) -> bool:
     logging.info('Writing %d datapoints to influxdb', len(entries))
-    return client.write_points(entries)
+    try:
+        return client.write_points(entries)
+    except InfluxDBClientError as e:
+        logging.exception('Failed to write data to influxdb')
+        raise
 
 
 def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, cloudstorage_bucket: Bucket,
