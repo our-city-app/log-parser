@@ -80,7 +80,7 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket):
 
 def save_statistic_entries(client, entries) -> bool:
     logging.info('Writing %d datapoints to influxdb', len(entries))
-    return client.write_points(entries, batch_size=MAX_DB_ENTRIES_PER_RPC)
+    return client.write_points(entries)
 
 
 def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, cloudstorage_bucket: Bucket,
