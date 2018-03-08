@@ -30,7 +30,6 @@ poolmngr = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where
 
 
 class Measurements(object):
-    FLOW_MEMBER_RESULTS = 'rogerthat.flow_member_result'
     CALLBACK_API = 'rogerthat.callback_api'
     API_CALLS = 'rogerthat.api_calls'
     CLIENT_CALL = 'rogerthat.client_call'
@@ -76,36 +75,17 @@ def callback_api(value: dict) -> Iterator[Any]:
         user_email = user_details['email']
     if tag and tag.startswith('{'):
         tag = None
-    if function_type == 'messaging.flow_member_result':
-        fields = {
-            'parent_message_key': params.get('parent_message_key')
-        }
-        if params.get('steps'):
-            fields['last_step_id'] = params['steps'][-1]['step_id']
-        yield {
-            'measurement': Measurements.FLOW_MEMBER_RESULTS,
-            'tags': {
-                'method': request_data.get('method'),
-                'tag': tag,
-                'flush_id': params.get('flush_id'),
-                'end_id': params.get('end_id'),
-                'app': app_id,
-                'service': value.get('user')
-            },
-            'time': timestamp,
-            'fields': fields
-        }
     yield {
         'measurement': Measurements.CALLBACK_API,
         'tags': {
             'tag': tag,
             'app': app_id,
-            'method': params.get('method'),
-            'service': value.get('user')
+            'method': function_type,
         },
         'time': timestamp,
         'fields': {
-            'user': user_email
+            'user': user_email,
+            'service': value.get('user')
         }
     }
 

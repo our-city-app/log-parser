@@ -23,25 +23,26 @@ def process(value: dict) -> Iterator[Dict[str, Any]]:
     request_info = value['data']
     tags = {
         'project': request_info.get('app_id'),  # e.g. e~rogerthat-server,
-        'host': request_info['host'],
-        'ip': request_info['ip'],
+        'status': request_info['status'],  # 200, 204, 500, ...
+    }
+    fields = {
+        'host': request_info['host'],  # e.g. version-xxx.rogerthat-server.appspot.com
         'resource': urlparse(request_info['resource']).path,  # strip query parameters
-        'status': request_info['status'],
+        'ip': request_info['ip'],
         'user_agent': request_info['user_agent'],
+        'latency': int(request_info['latency']),
+        'status': int(request_info['status']),
+        'mcycles': int(request_info['mcycles']),
+        'pending_time': float(request_info['pending_time']),
+        'response_size': request_info['response_size'],
+        'task_retry_count': int(request_info.get('task_retry_count', 0))
     }
     if request_info.get('task_name'):
-        tags['task_name'] = request_info['task_name']
         tags['task_queue_name'] = request_info['task_queue_name']
+        fields['task_name'] = request_info['task_name']
     yield {
         'measurement': 'request-info',
         'tags': tags,
         'time': datetime.utcfromtimestamp(request_info['start_time']).isoformat() + 'Z',
-        'fields': {
-            'latency': int(request_info['latency']),
-            'status': int(request_info['status']),
-            'mcycles': int(request_info['mcycles']),
-            'pending_time': float(request_info['pending_time']),
-            'response_size': request_info['response_size'],
-            'task_retry_count': int(request_info.get('task_retry_count', 0))
-        }
+        'fields': fields
     }
