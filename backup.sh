@@ -8,10 +8,7 @@ function clean {
 }
 
 function backup {
-  # Backup metastore (system info, user info, db shards)
-  docker exec influxdb influxd backup /tmp/backup
-  # Backup data
-  docker exec influxdb influxd backup -database monitoring /tmp/backup
+  docker exec influxdb influxd backup -portable /tmp/backup
   # Backup grafana data
   sqlite3 monitoring/grafana/grafana.db ".backup './monitoring/backup/grafana.db'"
 }
