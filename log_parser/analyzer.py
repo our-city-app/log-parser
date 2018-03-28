@@ -21,7 +21,7 @@ from typing import Iterator, Dict, Any, List, Union
 
 import ijson
 
-from log_parser.parsers import request_log, rogerthat, threefold
+from log_parser.parsers import request_log, rogerthat, threefold, oca
 from log_parser.parsers.filter import registry, request_filter
 
 log_types = {
@@ -30,6 +30,10 @@ log_types = {
     'api': rogerthat.api,
     'app': rogerthat.app,
     'web': rogerthat.web,
+    'rogerthat.created_apps': rogerthat.created_apps,
+    'rogerthat.total_users': rogerthat.all_users,
+    'rogerthat.total_services': rogerthat.total_services,
+    'oca.active_modules': oca.active_modules,
     'web_channel': rogerthat.web_channel,
     'tf.web': threefold.web
 }

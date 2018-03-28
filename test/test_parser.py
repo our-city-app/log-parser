@@ -35,42 +35,58 @@ def get_file_content(filename: str) -> str:
 
 class ParserTest(unittest.TestCase):
 
+    def check_length(self, filename, length):
+        line = get_file_content(filename)
+        result = _analyze(line)
+        self.assertEquals(length, len(result))
+        return result
+
     def test_sandwich_callback(self):
-        line = get_file_content('sandwich-callback.json')
-        self.assertEquals(1, len(_analyze(line)))
+        self.check_length('sandwich-callback.json', 1)
 
     def test_sandwich_result(self):
-        line = get_file_content('sandwich-fmr.json')
-        self.assertEquals(2, len(_analyze(line)))
+        self.check_length('sandwich-fmr.json', 1)
 
     def test_request(self):
-        line = get_file_content('request-log.json')
-        self.assertEquals(1, len(_analyze(line)))
+        self.check_length('request-log.json', 1)
 
     def test_empty_app_log(self):
-        line = get_file_content('empty-app-log.json')
-        self.assertEquals(0, len(_analyze(line)))
+        self.check_length('empty-app-log.json', 0)
 
     def test_app_log(self):
-        line = get_file_content('app-log.json')
-        self.assertEquals(3, len(_analyze(line)))
+        self.check_length('app-log.json', 3)
 
     def test_truncated_log(self):
-        line = get_file_content('truncated.json')
-        self.assertEqual(2, len(_analyze(line)))
+        self.check_length('truncated.json', 2)
 
     def test_callback_api(self):
-        line = get_file_content('callback-api.json')
-        self.assertEqual(1, len(_analyze(line)))
+        self.check_length('callback-api.json', 1)
 
     def test_callback_garbage_tag(self):
-        line = get_file_content('callback-api-bad-tag.json')
-        self.assertEqual(1, len(_analyze(line)))
+        self.check_length('callback-api-bad-tag.json', 1)
 
     def test_api(self):
-        line = get_file_content('api.json')
-        self.assertEqual(1, len(_analyze(line)))
+        self.check_length('api.json', 1)
 
     def test_without_type(self):
-        line = get_file_content('without-type.json')
-        self.assertEqual(1, len(_analyze(line)))
+        self.check_length('without-type.json', 1)
+
+    def test_created_apps(self):
+        result = self.check_length('created-apps.json', 5)
+        self.assertDictEqual({'country': 'BE', 'type': 'Enterprise'}, result[0]['tags'])
+
+    def test_total_users(self):
+        result = self.check_length('total-users.json', 31)
+        self.assertDictEqual({'app': 'em-be-mobietrain-demo2'}, result[0]['tags'])
+
+    def test_total_services(self):
+        result = self.check_length('total-services.json', 17)
+        self.assertDictEqual({'type': 'Merchant', 'app': 'be-berlare'}, result[0]['tags'])
+        self.assertEqual(6, result[0]['fields']['amount'])
+
+    def test_active_modules(self):
+        result = self.check_length('active-modules.json', 31)
+        self.assertDictEqual({'app': 'be-berlare', 'module': 'static_content'}, result[0]['tags'])
+        self.assertEqual(5, result[0]['fields']['amount'])
+        self.assertEqual('qr_codes', result[-1]['tags']['module'])
+        self.assertEqual(101, result[-1]['fields']['amount'])

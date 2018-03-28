@@ -1,0 +1,20 @@
+{
+  "type": "rogerthat.created_apps",
+  "response_data": null,
+  "timestamp": 1522022400.0,
+  "request_data": {
+    "Enterprise": {
+      "BE": 4
+    },
+    "YSAAA": {
+      "BE": 1
+    },
+    "Rogerthat": {
+      "BE": 1
+    },
+    "City app": {
+      "BE": 24,
+      "CD": 1
+    }
+  }
+}

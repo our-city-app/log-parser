@@ -1,0 +1,42 @@
+{
+  "type": "oca.active_modules",
+  "response_data": null,
+  "request_data": {
+    "be-berlare": {
+      "static_content": 5,
+      "when_where": 7,
+      "ask_question": 6,
+      "broadcast": 6,
+      "agenda": 6,
+      "appointment": 1,
+      "billing": 7,
+      "bulk_invite": 6,
+      "loyalty": 1,
+      "qr_codes": 6
+    },
+    "rogerthat": {
+      "menu": 14,
+      "static_content": 31,
+      "pharmacy_order": 11,
+      "discussion_groups": 7,
+      "repair": 12,
+      "DJMATIC_JUKEBOX": 1,
+      "ask_question": 103,
+      "group_purchase": 10,
+      "broadcast": 105,
+      "city_app": 15,
+      "when_where": 102,
+      "agenda": 103,
+      "appointment": 14,
+      "sandwich_bar": 15,
+      "restaurant_reservation": 11,
+      "order": 11,
+      "billing": 106,
+      "bulk_invite": 101,
+      "city_vouchers": 1,
+      "loyalty": 13,
+      "qr_codes": 101
+    }
+  },
+  "timestamp": 1522232397.0
+}

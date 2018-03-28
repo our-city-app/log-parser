@@ -1,0 +1,40 @@
+{
+  "type": "rogerthat.total_services",
+  "response_data": null,
+  "request_data": {
+    "be-berlare": {
+      "Merchant": 6
+    },
+    "be-sint-truiden": {
+      "Merchant": 1
+    },
+    "be-beveren": {
+      "Merchant": 1
+    },
+    "be-gent": {
+      "Association": 1,
+      "Care": 2,
+      "Merchant": 12,
+      "Community service": 1
+    },
+    "be-wortegem-petegem": {
+      "Community service": 2
+    },
+    "rogerthat": {
+      "Service": 2,
+      "Care": 3,
+      "Totally not an association": 6,
+      "MMMMMERchant": 36,
+      "Community service": 11
+    },
+    "cd-kinshasa": {
+      "Community service": 3,
+      "Merchant": 2
+    },
+    "be-niel": {
+      "Care": 1,
+      "Merchant": 7
+    }
+  },
+  "timestamp": 1522163020.0
+}

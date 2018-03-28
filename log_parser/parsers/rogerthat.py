@@ -18,6 +18,7 @@ import json
 import re
 from datetime import datetime
 from functools import lru_cache
+from json import JSONDecodeError
 from typing import Union, Iterator, Any
 
 import certifi
@@ -30,10 +31,13 @@ poolmngr = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where
 
 
 class Measurements(object):
-    CALLBACK_API = 'rogerthat.callback_api'
+    ALL_USERS = 'rogerthat.all_users'
     API_CALLS = 'rogerthat.api_calls'
+    CALLBACK_API = 'rogerthat.callback_api'
+    CREATED_APPS = 'rogerthat.created_apps'
     CLIENT_CALL = 'rogerthat.client_call'
     MESSAGES = 'rogerthat.messages'
+    TOTAL_SERVICES = 'rogerthat.total_services'
 
 
 def _get_time(value: dict) -> str:
@@ -47,7 +51,7 @@ def parse_to_human_readable_tag(tag: str) -> Union[str, None]:
     if tag.startswith('{') and tag.endswith('}'):
         try:
             tag_dict = json.loads(tag)
-        except:
+        except (JSONDecodeError, TypeError):
             return tag
         return tag_dict.get('__rt__.tag', tag)
 
@@ -207,3 +211,59 @@ def _get_app_id_by_service_hash(service_hash: str) -> Union[str, None]:
     if res.status != 200:
         raise Exception('Failed to get app_id for service hash %s', service_hash)
     return json.loads(res.data)['app_id']
+
+
+def created_apps(value: dict) -> Iterator[dict]:
+    # value = {
+    #     "request_data": {
+    #         "YSAAA": {"BE": 1},
+    #         "Enterprise": {"BE": 4},
+    #         "Rogerthat": {"BE": 1},
+    #         "City app": {"BE": 24, "CD": 1}
+    #     },
+    #     "timestamp": 1520985600.0,
+    #     "type": "rogerthat.created_apps"
+    # }
+    for app_type, values in value.get('request_data', {}).items():
+        for country_code, amount in values.items():
+            yield {
+                'measurement': Measurements.CREATED_APPS,
+                'tags': {
+                    'type': app_type,
+                    'country': country_code
+                },
+                'time': _get_time(value),
+                'fields': {
+                    'amount': amount
+                }
+            }
+
+
+def all_users(value: dict) -> Iterator[dict]:
+    for app_id, amount in value.get('request_data', {}).items():
+        yield {
+            'measurement': Measurements.ALL_USERS,
+            'tags': {
+                'app': app_id,
+            },
+            'time': _get_time(value),
+            'fields': {
+                'amount': amount
+            }
+        }
+
+
+def total_services(value: dict) -> Iterator[dict]:
+    for app_id, values in value.get('request_data', {}).items():
+        for organization_type, amount in values.items():
+            yield {
+                'measurement': Measurements.TOTAL_SERVICES,
+                'tags': {
+                    'type': organization_type,
+                    'app': app_id
+                },
+                'time': _get_time(value),
+                'fields': {
+                    'amount': amount
+                }
+            }
