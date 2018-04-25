@@ -79,13 +79,16 @@ def callback_api(value: dict) -> Iterator[Any]:
         user_email = user_details['email']
     if tag and tag.startswith('{'):
         tag = None
+    tags = {
+        'tag': tag,
+        'app': app_id,
+        'function': function_type,
+    }
+    if function_type == 'system.api_call':
+        tags['method'] = params.get('method')
     yield {
         'measurement': Measurements.CALLBACK_API,
-        'tags': {
-            'tag': tag,
-            'app': app_id,
-            'method': function_type,
-        },
+        'tags': tags,
         'time': timestamp,
         'fields': {
             'user': user_email,

@@ -1,0 +1,34 @@
+{
+  "function": "system.api_call",
+  "status": true,
+  "request_data": {
+    "callback_name": null,
+    "params": {
+      "user_details": [
+        {
+          "public_key": null,
+          "name": "Test user",
+          "language": "nl_BE",
+          "app_id": "osa-loyalty",
+          "avatar_url": "https://rogerth.at/unauthenticated/mobi/cached/avatar/1",
+          "public_keys": [],
+          "email": "sample_user"
+        }
+      ],
+      "email": "sample_user",
+      "method": "solutions.loyalty.load",
+      "tag": null,
+      "params": "{\"loyalty_type\":1,\"timestamp\":1522312018,\"user_details\":{}}",
+      "service_identity": "+default+"
+    },
+    "method": "system.api_call",
+    "id": "38e18897-332a-11e8-be19-61ce3400bc48"
+  },
+  "timestamp": 1522311707.11219,
+  "response_data": {
+    "result": "{\"email\":\"test@example.com\",\"visits\":[{\"timestamp\":1522218898,\"timestamp_day\":1522195200,\"loyalty_type\":1,\"key\":\"ahJlfnJvZ2VydGhhdC1zZXJ2ZXJyVwsSBmNvbW1vbiIbc2xhZ2VyaWpAc2xhZ2VyaWpzdGVmYW4ubmV0DAsSI1NvbHV0aW9uTG95YWx0eVZpc2l0UmV2ZW51ZURpc2NvdW50GICAgKyA_IUJDA\",\"value_number\":1190}],\"app_id\":\"be-loc\"}",
+    "error": null
+  },
+  "type": "callback_api",
+  "user": "sample_user"
+}

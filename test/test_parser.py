@@ -62,6 +62,11 @@ class ParserTest(unittest.TestCase):
     def test_callback_api(self):
         self.check_length('callback-api.json', 1)
 
+    def test_callback_api_loyalty(self):
+        result = self.check_length('callback-api-loyalty.json', 1)
+        self.assertEqual(result[0]['tags']['method'], 'solutions.loyalty.load')
+        self.assertEqual(result[0]['tags']['function'], 'system.api_call')
+
     def test_callback_garbage_tag(self):
         self.check_length('callback-api-bad-tag.json', 1)
 
