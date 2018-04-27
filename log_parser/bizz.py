@@ -59,7 +59,7 @@ def _get_next_date(cloudstorage_bucket: Bucket, min_date: datetime = None) -> Op
         return None
 
 
-def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket):
+def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -> List[str]:
     # Returns all log files for a whole year
     settings = db.get_settings()
     logging.info('Starting processing logs from %s', settings.last_date)
@@ -70,6 +70,8 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket):
     done_log_filenames = db.get_all_processed_logs(year_str)
     files = sorted(filter(lambda f: f not in done_log_filenames,
                           map(lambda b: b.name, cloudstorage_bucket.list_blobs(prefix=year_str))))
+    if not files:
+        return []
     min_date = datetime.strptime((files[-1]).split('/')[0], '%Y-%m-%d %H:%M:%S')
     next_date = _get_next_date(cloudstorage_bucket, min_date) or min_date
     if next_date != settings.last_date:
