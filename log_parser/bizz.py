@@ -15,7 +15,7 @@
 #
 # @@license_version:1.4@@
 import logging
-import tempfile
+import os
 from datetime import datetime
 from typing import Optional, List
 
@@ -68,8 +68,8 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -
         db.save_settings(settings)
     year_str = str(settings.last_date.year)
     done_log_filenames = db.get_all_processed_logs(year_str)
-    files = sorted(filter(lambda f: f not in done_log_filenames,
-                          map(lambda b: b.name, cloudstorage_bucket.list_blobs(prefix=year_str))))
+    filenames_in_year = map(lambda b: b.name, cloudstorage_bucket.list_blobs(prefix=year_str))
+    files = list(sorted(filter(lambda f: f not in done_log_filenames, filenames_in_year)))
     if not files:
         return []
     min_date = datetime.strptime((files[-1]).split('/')[0], '%Y-%m-%d %H:%M:%S')
@@ -85,13 +85,18 @@ def save_statistic_entries(client, entries) -> bool:
     logging.info('Writing %d datapoints to influxdb', len(entries))
     try:
         return client.write_points(entries)
-    except InfluxDBClientError as e:
+    except InfluxDBClientError:
         logging.exception('Failed to write data to influxdb')
         raise
 
 
 def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, cloudstorage_bucket: Bucket,
                  bucket_path: str):
+    """
+    Processes a log file its contents.
+    Downloads the file if it's not already on disk.
+    """
+    logging.debug('Processing logs in file %s', bucket_path)
     date = _get_date_from_filename(bucket_path)
     log_folder = get_log_folder(date)
     file_name = _get_filename(bucket_path)
@@ -101,10 +106,17 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
         logging.warning('File %s already processed, doing nothing', bucket_path)
         return
     to_save = []  # type: List[dict]
-    logging.info('Downloading %s', bucket_path)
+
     blob = Blob(bucket_path, cloudstorage_bucket)
-    with tempfile.NamedTemporaryFile(delete=True) as file_obj:
-        blob.download_to_file(file_obj)
+    directory, filename = bucket_path.split('/')
+    dir_path = os.path.join(db.root_dir, 'data', directory)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    disk_path = os.path.join(dir_path, filename)
+    if not os.path.exists(filename):
+        logging.info('Downloading %s', bucket_path)
+        blob.download_to_filename(disk_path)
+    with open(disk_path) as file_obj:
         logging.info('Processing %s', bucket_path)
         file_obj.seek(0)
         for line in file_obj:
@@ -112,7 +124,7 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
             if line_number % 5000 == 0:
                 logging.info('Processing line %s of %s', line_number, bucket_path)
             try:
-                to_save.extend(analyze(line.decode('utf-8')))
+                to_save.extend(analyze(line))
             except Exception:
                 logging.exception('Could not process line %s', line)
             if len(to_save) > MAX_DB_ENTRIES_PER_RPC:

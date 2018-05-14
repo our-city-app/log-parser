@@ -38,7 +38,7 @@ class DatabaseConnection(object):
     root_dir = None
 
     def __init__(self, root_dir) -> None:
-        self.root_dir = root_dir
+        self.root_dir = os.path.realpath(root_dir)
 
     def get_settings(self) -> LogParserSettings:
         f_path = os.path.join(self.root_dir, 'settings.json')

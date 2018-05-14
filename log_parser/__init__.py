@@ -45,7 +45,11 @@ def get_gcs_bucket(cloudstorage_bucket):
 def process_file(file_name: str, db: DatabaseConnection, influxdb_client: InfluxDBClient,
                  configuration: LogParserConfig) -> None:
     cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
-    process_logs(db, influxdb_client, cloudstorage_bucket, file_name)
+    try:
+        process_logs(db, influxdb_client, cloudstorage_bucket, file_name)
+    except Exception as e:
+        logging.error('Failed to process file %s', file_name)
+        logging.exception(e)
 
 
 def get_client(config: LogParserConfig) -> InfluxDBClient:
