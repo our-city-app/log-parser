@@ -131,6 +131,9 @@ def app(value: dict) -> Iterator[Any]:
     #   "user": "c356f0adc203397a9d89ff9e1a6e6b54:em-be-idola"
     # }
     request_data = value.get('request_data', {})
+    # Sometimes, a log line of type 'channel' is too long so it has to 'type' property, so we need to ignore those here
+    if value.get('type') is None and type(request_data) is str:
+        return
     user = value.get('user', UNKNOWN)
     if ':' in user:
         user, app_id = user.split(':', 1)

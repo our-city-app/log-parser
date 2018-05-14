@@ -1,0 +1,7 @@
+{
+  "function": "rogerthat.friend.ackInvitation",
+  "request_data": "{\"timestamp\":1524132789,\"service_identity\":null,\"data\":\"{}\"}",
+  "timestamp": 1524132789.02861,
+  "response_data": null,
+  "user": "775e806fa199eb97ff677d41fad44e00:be-diksmuide"
+}

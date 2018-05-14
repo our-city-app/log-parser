@@ -95,3 +95,6 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(5, result[0]['fields']['amount'])
         self.assertEqual('qr_codes', result[-1]['tags']['module'])
         self.assertEqual(101, result[-1]['fields']['amount'])
+
+    def test_ignore_channel(self):
+        self.check_length('channel.json', 0)
