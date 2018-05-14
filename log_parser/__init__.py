@@ -60,7 +60,8 @@ def get_client(config: LogParserConfig) -> InfluxDBClient:
                           verify_ssl=config.influxdb.ssl,
                           database=config.influxdb.db,
                           username=config.influxdb.username,
-                          password=config.influxdb.password)
+                          password=config.influxdb.password,
+                          retries=5)
 
 
 def main(process_count: int, data_path: str, clean: bool):

@@ -24,7 +24,7 @@ from influxdb import InfluxDBClient
 from influxdb.exceptions import InfluxDBClientError
 
 from log_parser.analyzer import analyze
-from log_parser.db import DatabaseConnection
+from log_parser.db import DatabaseConnection, create_folder
 
 MAX_DB_ENTRIES_PER_RPC = 5000
 
@@ -110,13 +110,17 @@ def clean_old_files(db: DatabaseConnection, cloudstorage_bucket: Bucket):
         year -= 1
 
 
-def save_statistic_entries(client, entries) -> bool:
+def save_statistic_entries(client: InfluxDBClient, entries: List[dict]) -> bool:
     logging.info('Writing %d datapoints to influxdb', len(entries))
     try:
         return client.write_points(entries)
-    except InfluxDBClientError:
-        logging.exception('Failed to write data to influxdb')
-        raise
+    except InfluxDBClientError as e:
+        if 'timeout' in e.content:
+            logging.warning('Timeout while writing to influxdb. Retrying...')
+            client.write_points(entries, batch_size=MAX_DB_ENTRIES_PER_RPC / 5)
+        else:
+            logging.exception('Failed to write data to influxdb')
+            raise
 
 
 def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, cloudstorage_bucket: Bucket,
@@ -139,8 +143,7 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
     blob = Blob(bucket_path, cloudstorage_bucket)
     directory, filename = bucket_path.split('/')
     dir_path = os.path.join(db.root_dir, 'data', directory)
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+    create_folder(dir_path)
     disk_path = os.path.join(dir_path, filename)
     if not os.path.exists(filename):
         logging.info('Downloading %s', bucket_path)

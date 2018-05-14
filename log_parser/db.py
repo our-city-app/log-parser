@@ -30,7 +30,11 @@ def touch(path):
 
 def create_folder(directory):
     if not os.path.exists(directory):
-        os.makedirs(directory)
+        try:
+            os.makedirs(directory)
+        except FileExistsError:
+            # Created in another thread
+            pass
 
 
 # todo: use a database (mysql or something)
