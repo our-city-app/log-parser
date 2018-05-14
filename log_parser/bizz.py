@@ -67,9 +67,7 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -
         settings.last_date = _get_next_date(cloudstorage_bucket)
         db.save_settings(settings)
     year_str = str(settings.last_date.year)
-    done_log_filenames = db.get_all_processed_logs(year_str)
-    filenames_in_year = map(lambda b: b.name, cloudstorage_bucket.list_blobs(prefix=year_str))
-    files = list(sorted(filter(lambda f: f not in done_log_filenames, filenames_in_year)))
+    files = get_unprocessed_logs(db, cloudstorage_bucket, year_str)
     if not files:
         return []
     min_date = datetime.strptime((files[-1]).split('/')[0], '%Y-%m-%d %H:%M:%S')
@@ -79,6 +77,37 @@ def start_processing_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket) -
         logging.info('Saving next date as %s', settings.last_date)
         db.save_settings(settings)
     return files
+
+
+def get_unprocessed_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket, year: str) -> List[str]:
+    done_log_filenames = db.get_all_processed_logs(year)
+    filenames_in_year = map(lambda b: b.name, cloudstorage_bucket.list_blobs(prefix=year))
+    return list(sorted(filter(lambda f: f not in done_log_filenames, filenames_in_year)))
+
+
+def clean_old_files(db: DatabaseConnection, cloudstorage_bucket: Bucket):
+    data_dir = os.path.join(db.root_dir, 'data')
+    year = datetime.now().year
+    while True:
+        if year < 2016:
+            break
+        year_str = str(year)
+        unprocessed_files = get_unprocessed_logs(db, cloudstorage_bucket, year_str)
+        if len(unprocessed_files) != 0:
+            year -= 1
+            logging.info('Not cleaning files for year %d because not all files have been processed yet', year)
+            continue
+        logging.info('Cleaning old files for year %d', year)
+        for folder_name in os.listdir(data_dir):
+            if folder_name.startswith(year_str):
+                date_dir = os.path.join(data_dir, folder_name)
+                logging.debug('Removing all files in folder %s', date_dir)
+                for filename in os.listdir(date_dir):
+                    file_path = os.path.join(data_dir, folder_name, filename)
+                    logging.debug('Removing file %s', file_path)
+                    os.remove(file_path)
+                os.rmdir(date_dir)
+        year -= 1
 
 
 def save_statistic_entries(client, entries) -> bool:

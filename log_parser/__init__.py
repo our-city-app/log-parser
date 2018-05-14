@@ -24,9 +24,10 @@ from multiprocessing.pool import Pool
 from typing import Set
 
 from google.cloud import storage
+from google.cloud.storage import Bucket
 from influxdb import InfluxDBClient
 
-from log_parser.bizz import start_processing_logs, process_logs
+from log_parser.bizz import start_processing_logs, process_logs, clean_old_files
 from log_parser.config import LogParserConfig
 from log_parser.db import DatabaseConnection
 
@@ -62,15 +63,22 @@ def get_client(config: LogParserConfig) -> InfluxDBClient:
                           password=config.influxdb.password)
 
 
-def main(process_count: int):
-    logging.info('Starting log parser with %s processes', process_count)
-    pool = Pool(process_count, maxtasksperchild=1)
+def main(process_count: int, data_path: str, clean: bool):
     with open(os.path.join(os.path.dirname(__file__), 'configuration.json'), 'r') as f:
         configuration = LogParserConfig(json.load(f))
-    db = DatabaseConnection(os.path.join(CURRENT_DIR, '..', 'parser'))
+    db = DatabaseConnection(data_path)
     cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
+    if clean:
+        clean_old_files(db, cloudstorage_bucket)
+    else:
+        logging.info('Starting log parser with %s processes', process_count)
+        process(configuration, db, cloudstorage_bucket, process_count)
+
+
+def process(configuration: LogParserConfig, db: DatabaseConnection, cloudstorage_bucket: Bucket, process_count: int):
     influxdb_client = get_client(configuration)
     queue: Set[str] = set()
+    pool = Pool(process_count, maxtasksperchild=1)
     while True:
         new_files = [f for f in start_processing_logs(db, cloudstorage_bucket) if f not in queue]
         if len(new_files) == 0:
@@ -90,5 +98,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser(description='Processes logs uploaded on cloudstorage')
     parser.add_argument('--processes', type=int, help='Number of processes to use', default=os.cpu_count() * 2)
+    parser.add_argument('--data_path', type=str, help='Path where the data will be stored. Defaults to ../parser',
+                        default=os.path.join(CURRENT_DIR, '..', 'parser'))
+    parser.add_argument('--clean', action='store_true', help='Clean old data files to free up disk space',
+                        default=False)
     args = parser.parse_args()
-    main(args.processes)
+    main(args.processes, args.data_path, args.clean)
