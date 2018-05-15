@@ -129,7 +129,6 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
     Processes a log file its contents.
     Downloads the file if it's not already on disk.
     """
-    logging.debug('Processing logs in file %s', bucket_path)
     date = _get_date_from_filename(bucket_path)
     log_folder = get_log_folder(date)
     file_name = _get_filename(bucket_path)
@@ -148,6 +147,7 @@ def process_logs(db: DatabaseConnection, influxdb_client: InfluxDBClient, clouds
     if not os.path.exists(filename):
         logging.info('Downloading %s', bucket_path)
         blob.download_to_filename(disk_path)
+    logging.debug('Processing logs in file %s', bucket_path)
     with open(disk_path) as file_obj:
         logging.info('Processing %s', bucket_path)
         file_obj.seek(0)
