@@ -65,8 +65,7 @@ def get_client(config: LogParserConfig) -> InfluxDBClient:
                           verify_ssl=config.influxdb.ssl,
                           database=config.influxdb.db,
                           username=config.influxdb.username,
-                          password=config.influxdb.password,
-                          retries=5)
+                          password=config.influxdb.password)
 
 
 def main(process_count: int, data_path: str, clean: bool):
@@ -84,6 +83,7 @@ def main(process_count: int, data_path: str, clean: bool):
 def after_processed(processed_file: Tuple[bool, str]) -> None:
     success, filename = processed_file
     if success:
+        logging.info('Finished processing file %s', processed_file)
         processed_files.add(filename)
     else:
         logging.info('Failed to process file %s, will retry', processed_file)
@@ -92,6 +92,7 @@ def after_processed(processed_file: Tuple[bool, str]) -> None:
 
 
 def after_error(result):
+    logging.error('Failed to process file')
     logging.exception(result)
 
 
@@ -110,8 +111,14 @@ def process(configuration: LogParserConfig, db: DatabaseConnection, cloudstorage
         logging.info('Processing %s files', len(new_files))
         for file_name in new_files:
             queue.add(file_name)
-            pool.apply_async(process_file, [file_name, db, influxdb_client, configuration], {}, after_processed,
-                             after_error)
+            handler = pool.apply_async(process_file, [file_name, db, influxdb_client, configuration], {},
+                                       after_processed, after_error)
+            try:
+                handler.get()
+            except Exception as e:
+                if file_name in queue:
+                    queue.remove(file_name)
+                logging.exception(e)
 
 
 if __name__ == '__main__':

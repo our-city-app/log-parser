@@ -26,7 +26,7 @@ from influxdb.exceptions import InfluxDBClientError
 from log_parser.analyzer import analyze
 from log_parser.db import DatabaseConnection, create_folder
 
-MAX_DB_ENTRIES_PER_RPC = 5000
+MAX_DB_ENTRIES_PER_RPC = 2000
 
 
 def _get_foldername(file_path) -> str:
