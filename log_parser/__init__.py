@@ -111,15 +111,8 @@ def process(configuration: LogParserConfig, db: DatabaseConnection, cloudstorage
         logging.info('Processing %s files', len(new_files))
         for file_name in new_files:
             queue.add(file_name)
-            handler = pool.apply_async(process_file, [file_name, db, influxdb_client, configuration], {},
-                                       after_processed, after_error)
-            try:
-                handler.get()
-            except Exception as e:
-                if file_name in queue:
-                    queue.remove(file_name)
-                logging.exception(e)
-
+            pool.apply_async(process_file, [file_name, db, influxdb_client, configuration], {}, after_processed,
+                             after_error)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
