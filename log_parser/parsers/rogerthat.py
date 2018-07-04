@@ -35,6 +35,7 @@ class Measurements(object):
     API_CALLS = 'rogerthat.api_calls'
     CALLBACK_API = 'rogerthat.callback_api'
     CREATED_APPS = 'rogerthat.created_apps'
+    RELEASED_APPS = 'rogerthat.released_apps'
     CLIENT_CALL = 'rogerthat.client_call'
     MESSAGES = 'rogerthat.messages'
     TOTAL_SERVICES = 'rogerthat.total_services'
@@ -234,6 +235,31 @@ def created_apps(value: dict) -> Iterator[dict]:
         for country_code, amount in values.items():
             yield {
                 'measurement': Measurements.CREATED_APPS,
+                'tags': {
+                    'type': app_type,
+                    'country': country_code
+                },
+                'time': _get_time(value),
+                'fields': {
+                    'amount': amount
+                }
+            }
+
+
+def released_apps(value: dict) -> Iterator[dict]:
+    # value = {
+    #     "request_data": {
+    #         "YSAAA": {"BE": 1},
+    #         "Rogerthat": {"BE": 1},
+    #         "City app": {"BE": 1, "CD": 1}
+    #     },
+    #     "timestamp": 1520985600.0,
+    #     "type": "rogerthat.released_apps"
+    # }
+    for app_type, values in value.get('request_data', {}).items():
+        for country_code, amount in values.items():
+            yield {
+                'measurement': Measurements.RELEASED_APPS,
                 'tags': {
                     'type': app_type,
                     'country': country_code

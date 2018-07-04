@@ -31,6 +31,7 @@ log_types = {
     'app': rogerthat.app,
     'web': rogerthat.web,
     'rogerthat.created_apps': rogerthat.created_apps,
+    'rogerthat.released_apps': rogerthat.released_apps,
     'rogerthat.total_users': rogerthat.all_users,
     'rogerthat.total_services': rogerthat.total_services,
     'oca.active_modules': oca.active_modules,
