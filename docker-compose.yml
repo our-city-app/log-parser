@@ -28,7 +28,7 @@ services:
     depends_on:
       - influxdb
     volumes:
-      - ./monitoring/parser:/code/parser
+      - ./monitoring/parser:/code/parser:cached
   backup:
     build: ./backup
     container_name: log-parser-backup
