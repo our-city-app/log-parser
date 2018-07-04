@@ -21,9 +21,11 @@ services:
       - ./monitoring/grafana:/var/lib/grafana
     ports:
       - "3333:3333"
+    user: "104"
   log_parser:
     build: .
     container_name: log_parser
+    image: log_parser_log_parser
     restart: unless-stopped
     depends_on:
       - influxdb
