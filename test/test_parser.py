@@ -19,6 +19,7 @@ import unittest
 from typing import List
 
 from log_parser.analyzer import analyze
+from log_parser.parsers import oca
 
 
 def _analyze(line: str) -> List[dict]:
@@ -98,3 +99,9 @@ class ParserTest(unittest.TestCase):
 
     def test_ignore_channel(self):
         self.check_length('channel.json', 0)
+
+    def test_oca_loyalty(self):
+        result = self.check_length('oca-custom-loyalty-cards.json', 5)
+        self.assertEqual(result[0]['fields']['amount'], 958)
+        self.assertEqual(result[0]['tags']['app'], 'be-destelbergen')
+        self.assertEqual(result[0]['measurement'], oca.Measurements.CUSTOM_LOYALTY_CARDS)

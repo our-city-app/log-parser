@@ -1,0 +1,32 @@
+{
+  "response_data": null,
+  "type": "oca.custom_loyalty_cards",
+  "request_data": [
+    {
+      "app_id": "be-destelbergen",
+      "amount": 958,
+      "country": "BE"
+    },
+    {
+      "app_id": "rogerthat",
+      "amount": 1005,
+      "country": "BE"
+    },
+    {
+      "app_id": "be-hoeilaart",
+      "amount": 1039,
+      "country": "BE"
+    },
+    {
+      "app_id": "be-waregem",
+      "amount": 1002,
+      "country": "BE"
+    },
+    {
+      "app_id": "be-loc",
+      "amount": 996,
+      "country": "BE"
+    }
+  ],
+  "timestamp": 1530705819.0
+}

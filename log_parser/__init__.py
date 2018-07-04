@@ -114,6 +114,7 @@ def process(configuration: LogParserConfig, db: DatabaseConnection, cloudstorage
             pool.apply_async(process_file, [file_name, db, influxdb_client, configuration], {}, after_processed,
                              after_error)
 
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser(description='Processes logs uploaded on cloudstorage')

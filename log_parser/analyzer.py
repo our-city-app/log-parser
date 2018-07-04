@@ -35,6 +35,7 @@ log_types = {
     'rogerthat.total_users': rogerthat.all_users,
     'rogerthat.total_services': rogerthat.total_services,
     'oca.active_modules': oca.active_modules,
+    'oca.custom_loyalty_cards': oca.custom_loyalty_cards,
     'web_channel': rogerthat.web_channel,
     'tf.web': threefold.web
 }

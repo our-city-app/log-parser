@@ -21,6 +21,7 @@ from log_parser.parsers.rogerthat import _get_time
 
 class Measurements(object):
     ACTIVE_MODULES = 'oca.active_modules'
+    CUSTOM_LOYALTY_CARDS = 'oca.custom_loyalty_cards'
 
 
 def active_modules(value: dict) -> Iterator[dict]:
@@ -37,3 +38,18 @@ def active_modules(value: dict) -> Iterator[dict]:
                     'amount': amount
                 }
             }
+
+
+def custom_loyalty_cards(value: dict) -> Iterator[dict]:
+    for stats in value.get('request_data', []):
+        yield {
+            'measurement': Measurements.CUSTOM_LOYALTY_CARDS,
+            'tags': {
+                'country': stats['country'],
+                'app': stats['app_id']
+            },
+            'time': _get_time(value),
+            'fields': {
+                'amount': stats['amount']
+            }
+        }
