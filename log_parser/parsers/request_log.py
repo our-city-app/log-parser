@@ -18,9 +18,6 @@ from datetime import datetime
 from typing import Iterator, Dict, Any
 from urllib.parse import urlparse
 
-properties = ['app_id', 'end_time', 'host', 'ip', 'latency', 'status', 'start_time', 'mcycles', 'resource',
-              'response_size', 'user_agent', 'task_queue_name', 'task_name', 'pending_time']
-
 
 def process(value: dict) -> Iterator[Dict[str, Any]]:
     request_info = value['data']
@@ -33,10 +30,9 @@ def process(value: dict) -> Iterator[Dict[str, Any]]:
         'resource': urlparse(request_info['resource']).path,  # strip query parameters
         'ip': request_info['ip'],
         'user_agent': request_info['user_agent'],
-        'latency': int(request_info['latency']),
+        'latency': float(request_info['latency']),
         'status': int(request_info['status']),
         'mcycles': int(request_info['mcycles']),
-        'pending_time': float(request_info['pending_time']),
         'response_size': request_info['response_size'],
         'task_retry_count': int(request_info.get('task_retry_count', 0))
     }
@@ -52,10 +48,34 @@ def process(value: dict) -> Iterator[Dict[str, Any]]:
 
 
 def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
-    request_info = {prop: request_log.get(prop) for prop in properties}
-    if request_info['task_name'] and request_log['protoPayload'].get('line', []):
-        log = request_log['protoPayload']['line'][0]
-        if 'X-Appengine-Taskretrycount' in log['message']:
-            headers = dict([tuple(header.split(':')) for header in log['message'].split(', ')])
-            request_info['task_retry_count'] = int(headers['X-Appengine-Taskretrycount'])
-    return process({'data': request_info})
+    proto_payload = request_log['protoPayload']
+    tags = {
+        'project': proto_payload.get('appId'),  # e.g. e~rogerthat-server,
+        'status': proto_payload['status'],  # 200, 204, 500, ...
+    }
+    fields = {
+        'host': proto_payload['host'],  # e.g. version-xxx.rogerthat-server.appspot.com
+        'resource': urlparse(proto_payload['resource']).path,  # strip query parameters
+        'ip': proto_payload['ip'],
+        'user_agent': proto_payload['userAgent'],
+        'latency': float(proto_payload['latency'].rstrip('s')),
+        'status': int(proto_payload['status']),
+        'mcycles': int(proto_payload['megaCycles']),
+        'response_size': int(proto_payload['responseSize']),
+        'task_retry_count': int(proto_payload.get('task_retry_count', 0))
+    }
+    if proto_payload.get('taskName') and request_log['protoPayload'].get('line', []):
+        log = proto_payload['line'][0]
+        msg = log['logMessage']
+        if 'X-Appengine-Taskretrycount' in msg:
+            headers = dict([tuple(header.split(':')) for header in msg.split(', ')])
+            proto_payload['task_retry_count'] = int(headers['X-Appengine-Taskretrycount'])
+    if proto_payload.get('taskName'):
+        tags['task_queue_name'] = proto_payload['taskQueueName']
+        fields['task_name'] = proto_payload['taskName']
+    yield {
+        'measurement': 'request-info',
+        'tags': tags,
+        'time': proto_payload['startTime'],
+        'fields': fields
+    }

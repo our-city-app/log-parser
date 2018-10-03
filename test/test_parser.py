@@ -107,4 +107,31 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(result[0]['measurement'], oca.Measurements.CUSTOM_LOYALTY_CARDS)
 
     def test_request_log(self):
-        self.check_length('full-request-log.json', 1)
+        result = self.check_length('full-request-log.json', 2)
+        self.assertEqual(result[0]['fields'], {'host': 'rogerthat-server.appspot.com',
+                                               'ip': '195.130.155.140',
+                                               'latency': 0.73131,
+                                               'mcycles': 138,
+                                               'resource': '/json-rpc',
+                                               'response_size': 291,
+                                               'status': 200,
+                                               'task_retry_count': 0,
+                                               'user_agent': 'be-herentals/2.1.2920 CFNetwork/974.2.1 Darwin/18.0.0'})
+        self.assertDictEqual(result[0]['tags'], {'project': 'e~rogerthat-server', 'status': 200})
+
+    def test_task(self):
+        result = self.check_length('test-log-task.json', 1)
+        self.assertDictEqual(result[0]['fields'], {'host': 'rogerthat-server.appspot.com',
+                                                   'ip': '0.1.0.2',
+                                                   'latency': 0.723739,
+                                                   'mcycles': 21,
+                                                   'resource': '/_ah/queue/deferred',
+                                                   'response_size': 84,
+                                                   'status': 200,
+                                                   'task_retry_count': 0,
+                                                   'task_name': '3202316446794980958',
+                                                   'user_agent': 'AppEngine-Google; (+http://code.google.com/appengine)'})
+        self.assertDictEqual(result[0]['tags'],
+                             {'project': 'e~rogerthat-server',
+                              'task_queue_name': 'fast',
+                              'status': 200})

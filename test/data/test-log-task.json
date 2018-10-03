@@ -1,0 +1,90 @@
+{
+  "httpRequest": {
+    "status": 200
+  },
+  "insertId": "5bb3205c0003185046be28d0",
+  "labels": {
+    "clone_id": "00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7"
+  },
+  "logName": "projects/rogerthat-server/logs/appengine.googleapis.com%2Frequest_log",
+  "operation": {
+    "first": true,
+    "id": "5bb3205b00ff04dbc3dc94a6e70001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "last": true,
+    "producer": "appengine.googleapis.com/request_id"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.appengine.logging.v1.RequestLog",
+    "appEngineRelease": "1.9.64",
+    "appId": "e~rogerthat-server",
+    "cost": 8.9517999999999995e-08,
+    "endTime": "2018-10-02T07:38:04.042142Z",
+    "finished": true,
+    "first": true,
+    "host": "rogerthat-server.appspot.com",
+    "httpVersion": "HTTP/1.1",
+    "instanceId": "00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7",
+    "instanceIndex": -1,
+    "ip": "0.1.0.2",
+    "latency": "0.723739s",
+    "line": [
+      {
+        "logMessage": "X-Appengine-Taskretrycount:0, X-Appengine-Tasketa:1538465882.951087, X-Appengine-Current-Namespace:, X-Appengine-Taskname:3202316446794980958, X-Appengine-Taskexecutioncount:0, X-Appengine-Queuename:fast, X-Appengine-Country:ZZ",
+        "severity": "INFO",
+        "time": "2018-10-02T07:38:03.321943Z"
+      },
+      {
+        "logMessage": "[XX-SLOGv1] {\"a\":{\"type_\":\"deferred\"},\"_dc\":\"eu6\",\"e\":\"mirawesley@hotmail.com:be-hooglede\",\"f\":\"request_identification\",\"_t\":47590325262080,\"m\":\"Request identification\",\"T\":\"Tue, 02 Oct 2018 07:38:03.323\",\"_i\":\"00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7\",\"_c\":\"ZZ\",\"t\":1538465883.323316}",
+        "severity": "INFO",
+        "time": "2018-10-02T07:38:03.323443Z"
+      },
+      {
+        "logMessage": "Queue: fast\ndeferred.run(rogerthat.bizz.look_and_feel.update_look_and_feel_for_user,\n             users.User(email='mirawesley@hotmail.com:be-hooglede'))",
+        "severity": "DEBUG",
+        "time": "2018-10-02T07:38:03.323674Z"
+      },
+      {
+        "logMessage": "(<function update_look_and_feel_response at 0x2b4860e4c398>, <function logError at 0x2b486075ec08>)",
+        "severity": "DEBUG",
+        "time": "2018-10-02T07:38:03.375792Z"
+      },
+      {
+        "logMessage": "Sending capi: com.mobicage.capi.system.updateLookAndFeel call to mirawesley@hotmail.com:be-hooglede, account: 668b988f-6ef5-11e8-ad95-89a1638634db@rogerth.at",
+        "severity": "INFO",
+        "time": "2018-10-02T07:38:03.680086Z"
+      },
+      {
+        "logMessage": "JabberRpc - Called http://195.130.155.72:8080/kick. Elapsed: 19ms, checked after 0ms\npayload: {\"a\":\"be-hooglede\",\"d\":\"CD1FB69CFDE54893B278C68B51FFD76F7390EC3A92C778972F07DF13C54C5F9C\",\"m\":\"eyJhcHMiOnsiY29udGVudC1hdmFpbGFibGUiOjF9fQ==\\n\",\"p\":5,\"r\":\"668b988f-6ef5-11e8-ad95-89a1638634db@rogerth.at\",\"t\":[\"apns\"],\"kid\":\"bce445e5-1d13-4bb7-8221-28bd577b0514\"}",
+        "severity": "INFO",
+        "time": "2018-10-02T07:38:04.040428Z"
+      }
+    ],
+    "megaCycles": "21",
+    "method": "POST",
+    "referrer": "https://rogerthat-server.appspot.com/json-rpc",
+    "requestId": "5bb3205b00ff04dbc3dc94a6e70001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "resource": "/_ah/queue/deferred",
+    "responseSize": "84",
+    "startTime": "2018-10-02T07:38:03.318403Z",
+    "status": 200,
+    "taskName": "3202316446794980958",
+    "taskQueueName": "fast",
+    "traceId": "9ce3250e84bfc866b02d425ce50de898",
+    "urlMapEntry": "rogerthat_admin.app",
+    "userAgent": "AppEngine-Google; (+http://code.google.com/appengine)",
+    "versionId": "20180928t104008"
+  },
+  "receiveTimestamp": "2018-10-02T07:38:04.205014846Z",
+  "resource": {
+    "labels": {
+      "module_id": "default",
+      "project_id": "rogerthat-server",
+      "version_id": "20180928t104008",
+      "zone": "eu6"
+    },
+    "type": "gae_app"
+  },
+  "severity": "INFO",
+  "timestamp": "2018-10-02T07:38:03.318403Z",
+  "trace": "projects/rogerthat-server/traces/9ce3250e84bfc866b02d425ce50de898"
+}

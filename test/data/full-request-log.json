@@ -2,14 +2,14 @@
   "httpRequest": {
     "status": 200
   },
-  "insertId": "5bb3204b00001a7853e1df93",
+  "insertId": "5bb3205800082632e289e0c8",
   "labels": {
-    "clone_id": "00c61b117cc9651b288b6a698b93f65af7f7924d150869e0a3e6108d92968ad54b2c82b3"
+    "clone_id": "00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7"
   },
   "logName": "projects/rogerthat-server/logs/appengine.googleapis.com%2Frequest_log",
   "operation": {
     "first": true,
-    "id": "5bb3204a00ff0c587c5437326f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "id": "5bb3205700ff0ae47e4f3b5d5f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
     "last": true,
     "producer": "appengine.googleapis.com/request_id"
   },
@@ -17,51 +17,51 @@
     "@type": "type.googleapis.com/google.appengine.logging.v1.RequestLog",
     "appEngineRelease": "1.9.64",
     "appId": "e~rogerthat-server",
-    "cost": 1.8998e-8,
-    "endTime": "2018-10-02T07:37:46.848873Z",
+    "cost": 3.2520999999999997e-08,
+    "endTime": "2018-10-02T07:38:00.445164Z",
     "finished": true,
     "first": true,
     "host": "rogerthat-server.appspot.com",
     "httpVersion": "HTTP/1.1",
-    "instanceId": "00c61b117cc9651b288b6a698b93f65af7f7924d150869e0a3e6108d92968ad54b2c82b3",
+    "instanceId": "00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7",
     "instanceIndex": -1,
-    "ip": "178.145.228.129",
-    "latency": "0.039789s",
+    "ip": "195.130.155.140",
+    "latency": "0.731310s",
     "line": [
       {
-        "logMessage": "[XX-SLOGv1] {\"a\":{\"type_\":\"user\"},\"_dc\":\"eu6\",\"e\":\"someone@gmail.com:be-sint-truiden\",\"f\":\"request_identification\",\"_t\":47614125840128,\"m\":\"Request identification\",\"T\":\"Tue, 02 Oct 2018 07:37:46.829\",\"_i\":\"00c61b117cc9651b288b6a698b93f65af7f7924d150869e0a3e6108d92968ad54b2c82b3\",\"_c\":\"BE\",\"t\":1538465866.829546}",
+        "logMessage": "[XX-SLOGv1] {\"a\":{\"type_\":\"user\"},\"_dc\":\"eu6\",\"e\":\"someone@gmail.com:be-herentals\",\"f\":\"request_identification\",\"_t\":47588941141760,\"m\":\"Request identification\",\"T\":\"Tue, 02 Oct 2018 07:37:59.759\",\"_i\":\"00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7\",\"_c\":\"BE\",\"t\":1538465879.759739}",
         "severity": "INFO",
-        "time": "2018-10-02T07:37:46.829705Z"
+        "time": "2018-10-02T07:37:59.759954Z"
       },
       {
-        "logMessage": "Request identity: someone@gmail.com:be-sint-truiden (android)",
+        "logMessage": "Request identity: someone@gmail.com:be-herentals (ios)",
         "severity": "INFO",
-        "time": "2018-10-02T07:37:46.829896Z"
+        "time": "2018-10-02T07:37:59.760147Z"
       },
       {
-        "logMessage": "Incoming HTTP call from 85b2b4c0-37e5-11e8-bf52-dbd2d260461f@rogerth.at",
+        "logMessage": "Incoming HTTP call from 3348dbe3-b788-11e8-b849-4b63092c392c@rogerth.at",
         "severity": "INFO",
-        "time": "2018-10-02T07:37:46.830574Z"
+        "time": "2018-10-02T07:37:59.760843Z"
       },
       {
-        "logMessage": "[XX-OFFLOADv1]{\"timestamp\":1538465866.847041,\"request_data\":{\"a\":[],\"c\":[],\"r\":[],\"av\":1},\"type\":\"app\",\"response_data\":{\"ap\":\"https://rogerthat-server.appspot.com/json-rpc\",\"av\":1,\"t\":1538465866,\"more\":false},\"user\":\"347af477715b99c4df8f21c3960785b4:be-sint-truiden\"}",
+        "logMessage": "[XX-OFFLOADv1]{\"timestamp\":1538465880.443679,\"request_data\":{\"a\":[\"70f706ef-05f8-4335-a6e7-5660637773b4\"],\"c\":[{\"a\":{\"request\":{\"cursor\":\"*****\",\"updated_since\":1538068115}},\"ci\":\"1fc470e3-1a76-41ef-83fa-4e765e7b2665\",\"f\":\"com.mobicage.api.news.getNews\",\"t\":1538465878,\"av\":1}],\"r\":[],\"av\":1},\"type\":\"app\",\"response_data\":{\"ap\":\"https://rogerthat-server.appspot.com/json-rpc\",\"r\":[{\"s\":\"success\",\"r\":{\"cursor\":null,\"result\":[]},\"av\":1,\"ci\":\"1fc470e3-1a76-41ef-83fa-4e765e7b2665\",\"t\":1538465878}],\"av\":1,\"t\":1538465880,\"more\":false},\"user\":\"295917a19fd6d6c320e67a36896d3656:be-herentals\"}",
         "severity": "INFO",
-        "time": "2018-10-02T07:37:46.847137Z"
+        "time": "2018-10-02T07:38:00.443779Z"
       }
     ],
-    "megaCycles": "36",
+    "megaCycles": "138",
     "method": "POST",
-    "requestId": "5bb3204a00ff0c587c5437326f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "requestId": "5bb3205700ff0ae47e4f3b5d5f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
     "resource": "/json-rpc",
-    "responseSize": "170",
-    "startTime": "2018-10-02T07:37:46.809084Z",
+    "responseSize": "291",
+    "startTime": "2018-10-02T07:37:59.713854Z",
     "status": 200,
-    "traceId": "ca4e73bbfc1a31b3edc7fc4645e17c6a",
+    "traceId": "4dde30b21b31556784d4dde360633812",
     "urlMapEntry": "rogerthat_unauthenticated.app",
-    "userAgent": "be-sint-truiden/2.1.4189.A",
+    "userAgent": "be-herentals/2.1.2920 CFNetwork/974.2.1 Darwin/18.0.0",
     "versionId": "20180928t104008"
   },
-  "receiveTimestamp": "2018-10-02T07:37:47.00899212Z",
+  "receiveTimestamp": "2018-10-02T07:38:00.535857259Z",
   "resource": {
     "labels": {
       "module_id": "default",
@@ -72,6 +72,6 @@
     "type": "gae_app"
   },
   "severity": "INFO",
-  "timestamp": "2018-10-02T07:37:46.809084Z",
-  "trace": "projects/rogerthat-server/traces/ca4e73bbfc1a31b3edc7fc4645e17c6a"
+  "timestamp": "2018-10-02T07:37:59.713854Z",
+  "trace": "projects/rogerthat-server/traces/4dde30b21b31556784d4dde360633812"
 }
