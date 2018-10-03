@@ -18,9 +18,8 @@
 import json
 import os
 import typing
-from datetime import datetime
 
-from log_parser.models import LogParserSettings, LogFile
+from log_parser.models import LogParserSettings, LogFile, LogParserFile
 
 
 def touch(path):
@@ -47,15 +46,19 @@ class DatabaseConnection(object):
     def get_settings(self) -> LogParserSettings:
         f_path = os.path.join(self.root_dir, 'settings.json')
         if not os.path.exists(f_path):
-            return LogParserSettings(None)
+            return LogParserSettings([])
         with open(f_path, 'r') as f:
-            settings = LogParserSettings(datetime.strptime(json.load(f)['last_date'], '%Y-%m-%dT%H:%M:%S'))
+            file_content = json.load(f)
+            settings = LogParserSettings([LogParserFile(f['name'], f['processed_timestamp'], f['bucket'])
+                                          for f in file_content.get('files', [])])
         return settings
 
     def save_settings(self, settings: LogParserSettings) -> LogParserSettings:
         f_path = os.path.join(self.root_dir, 'settings.json')
         with open(f_path, 'w') as f:
-            f.write(json.dumps({'last_date': settings.last_date.isoformat()}))
+            f.write(json.dumps({
+                'files': [f.to_dict() for f in settings.files]
+            }))
         return settings
 
     def get_all_processed_logs(self, year: str) -> typing.List[str]:

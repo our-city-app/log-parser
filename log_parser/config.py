@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
+from typing import List
 
 
 class InfluxConfig(object):
@@ -28,7 +29,7 @@ class InfluxConfig(object):
 
 class LogParserConfig(object):
     def __init__(self, config: dict) -> None:
-        self.cloudstorage_bucket = config.get('cloudstorage_bucket')  # type: str
+        self.buckets = config.get('buckets', [])  # type: List[str]
         self.influxdb = InfluxConfig(config.get('influxdb', {}))  # type: InfluxConfig
         self.debug = config.get('debug', False)  # type: bool
         self.interval = config.get('interval', 120)  # type: int

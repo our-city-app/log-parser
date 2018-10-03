@@ -14,13 +14,22 @@
 # limitations under the License.
 #
 # @@license_version:1.4@@
-from datetime import datetime
-from typing import Union
+from typing import Union, List
+
+
+class LogParserFile(object):
+    def __init__(self, name: str, processed_timestamp: Union[int, None], bucket: str):
+        self.name = name
+        self.processed_timestamp = processed_timestamp
+        self.bucket = bucket
+
+    def to_dict(self):
+        return {'name': self.name, 'processed_timestamp': self.processed_timestamp, 'bucket': self.bucket}
 
 
 class LogParserSettings(object):
-    def __init__(self, last_date: Union[datetime, None]) -> None:
-        self.last_date = last_date
+    def __init__(self, files: List[LogParserFile]) -> None:
+        self.files = files
 
 
 class LogFile(object):

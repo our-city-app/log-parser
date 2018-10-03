@@ -1,0 +1,77 @@
+{
+  "httpRequest": {
+    "status": 200
+  },
+  "insertId": "5bb3204b00001a7853e1df93",
+  "labels": {
+    "clone_id": "00c61b117cc9651b288b6a698b93f65af7f7924d150869e0a3e6108d92968ad54b2c82b3"
+  },
+  "logName": "projects/rogerthat-server/logs/appengine.googleapis.com%2Frequest_log",
+  "operation": {
+    "first": true,
+    "id": "5bb3204a00ff0c587c5437326f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "last": true,
+    "producer": "appengine.googleapis.com/request_id"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.appengine.logging.v1.RequestLog",
+    "appEngineRelease": "1.9.64",
+    "appId": "e~rogerthat-server",
+    "cost": 1.8998e-8,
+    "endTime": "2018-10-02T07:37:46.848873Z",
+    "finished": true,
+    "first": true,
+    "host": "rogerthat-server.appspot.com",
+    "httpVersion": "HTTP/1.1",
+    "instanceId": "00c61b117cc9651b288b6a698b93f65af7f7924d150869e0a3e6108d92968ad54b2c82b3",
+    "instanceIndex": -1,
+    "ip": "178.145.228.129",
+    "latency": "0.039789s",
+    "line": [
+      {
+        "logMessage": "[XX-SLOGv1] {\"a\":{\"type_\":\"user\"},\"_dc\":\"eu6\",\"e\":\"someone@gmail.com:be-sint-truiden\",\"f\":\"request_identification\",\"_t\":47614125840128,\"m\":\"Request identification\",\"T\":\"Tue, 02 Oct 2018 07:37:46.829\",\"_i\":\"00c61b117cc9651b288b6a698b93f65af7f7924d150869e0a3e6108d92968ad54b2c82b3\",\"_c\":\"BE\",\"t\":1538465866.829546}",
+        "severity": "INFO",
+        "time": "2018-10-02T07:37:46.829705Z"
+      },
+      {
+        "logMessage": "Request identity: someone@gmail.com:be-sint-truiden (android)",
+        "severity": "INFO",
+        "time": "2018-10-02T07:37:46.829896Z"
+      },
+      {
+        "logMessage": "Incoming HTTP call from 85b2b4c0-37e5-11e8-bf52-dbd2d260461f@rogerth.at",
+        "severity": "INFO",
+        "time": "2018-10-02T07:37:46.830574Z"
+      },
+      {
+        "logMessage": "[XX-OFFLOADv1]{\"timestamp\":1538465866.847041,\"request_data\":{\"a\":[],\"c\":[],\"r\":[],\"av\":1},\"type\":\"app\",\"response_data\":{\"ap\":\"https://rogerthat-server.appspot.com/json-rpc\",\"av\":1,\"t\":1538465866,\"more\":false},\"user\":\"347af477715b99c4df8f21c3960785b4:be-sint-truiden\"}",
+        "severity": "INFO",
+        "time": "2018-10-02T07:37:46.847137Z"
+      }
+    ],
+    "megaCycles": "36",
+    "method": "POST",
+    "requestId": "5bb3204a00ff0c587c5437326f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "resource": "/json-rpc",
+    "responseSize": "170",
+    "startTime": "2018-10-02T07:37:46.809084Z",
+    "status": 200,
+    "traceId": "ca4e73bbfc1a31b3edc7fc4645e17c6a",
+    "urlMapEntry": "rogerthat_unauthenticated.app",
+    "userAgent": "be-sint-truiden/2.1.4189.A",
+    "versionId": "20180928t104008"
+  },
+  "receiveTimestamp": "2018-10-02T07:37:47.00899212Z",
+  "resource": {
+    "labels": {
+      "module_id": "default",
+      "project_id": "rogerthat-server",
+      "version_id": "20180928t104008",
+      "zone": "eu6"
+    },
+    "type": "gae_app"
+  },
+  "severity": "INFO",
+  "timestamp": "2018-10-02T07:37:46.809084Z",
+  "trace": "projects/rogerthat-server/traces/ca4e73bbfc1a31b3edc7fc4645e17c6a"
+}

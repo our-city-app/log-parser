@@ -20,14 +20,15 @@ import json
 import logging
 import os
 import time
+from collections import defaultdict
+from multiprocessing import SimpleQueue
 from multiprocessing.pool import Pool
-from typing import Set, Tuple
+from typing import Tuple
 
 from google.cloud import storage
-from google.cloud.storage import Bucket
 from influxdb import InfluxDBClient
 
-from log_parser.bizz import start_processing_logs, process_logs, clean_old_files
+from log_parser.bizz import process_logs, get_new_files_to_process
 from log_parser.config import LogParserConfig
 from log_parser.db import DatabaseConnection
 
@@ -37,25 +38,7 @@ logging.basicConfig(format='%(levelname)-8s %(process)s %(asctime)s,%(msecs)3.0f
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 CURRENT_DIR = os.path.dirname(__file__)
 
-queue: Set[str] = set()
-processed_files = set()
-
-
-def get_gcs_bucket(cloudstorage_bucket):
-    storage_client = storage.Client.from_service_account_json(os.path.join(CURRENT_DIR, 'credentials.json'))
-    return storage_client.bucket(cloudstorage_bucket)
-
-
-def process_file(file_name: str, db: DatabaseConnection, influxdb_client: InfluxDBClient,
-                 configuration: LogParserConfig) -> Tuple[bool, str]:
-    cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
-    try:
-        process_logs(db, influxdb_client, cloudstorage_bucket, file_name)
-        return True, file_name
-    except Exception as e:
-        logging.error('Failed to process file %s', file_name)
-        logging.exception(e)
-        return False, file_name
+finished_queue = SimpleQueue()
 
 
 def get_client(config: LogParserConfig) -> InfluxDBClient:
@@ -68,51 +51,90 @@ def get_client(config: LogParserConfig) -> InfluxDBClient:
                           password=config.influxdb.password)
 
 
-def main(process_count: int, data_path: str, clean: bool):
+def main(process_count: int, data_path: str):
     with open(os.path.join(os.path.dirname(__file__), 'configuration.json'), 'r') as f:
         configuration = LogParserConfig(json.load(f))
     db = DatabaseConnection(data_path)
-    cloudstorage_bucket = get_gcs_bucket(configuration.cloudstorage_bucket)
-    if clean:
-        clean_old_files(db, cloudstorage_bucket)
-    else:
-        logging.info('Starting log parser with %s processes', process_count)
-        process(configuration, db, cloudstorage_bucket, process_count)
+    logging.info('Starting log parser with %s processes', process_count)
+    process(configuration, db, process_count)
 
 
-def after_processed(processed_file: Tuple[bool, str]) -> None:
-    success, filename = processed_file
+def get_gcs_bucket(cloudstorage_bucket):
+    storage_client = storage.Client.from_service_account_json(os.path.join(CURRENT_DIR, 'credentials.json'))
+    return storage_client.bucket(cloudstorage_bucket)
+
+
+def process_file(bucket_name: str, file_name: str, download_directory: str, influxdb_client: InfluxDBClient) -> Tuple[
+    bool, str, str]:
+    """Processes the file in a separate process."""
+    try:
+        cloudstorage_bucket = get_gcs_bucket(bucket_name)
+        process_logs(download_directory, influxdb_client, cloudstorage_bucket, file_name)
+        return True, bucket_name, file_name
+    except Exception as e:
+        logging.error('Failed to process file %s', file_name)
+        logging.exception(e)
+        return False, bucket_name, file_name
+
+
+def after_processed(processed_file: Tuple[bool, str, str]) -> None:
+    success, bucket_name, filename = processed_file
     if success:
-        logging.info('Finished processing file %s', processed_file)
-        processed_files.add(filename)
+        logging.info('%s: Finished processing file %s', bucket_name, filename)
     else:
-        logging.info('Failed to process file %s, will retry', processed_file)
-    if filename in queue:
-        queue.remove(filename)
+        logging.info('%s: Failed to process file %s, will retry', bucket_name, filename)
+    finished_queue.put(processed_file)
 
 
 def after_error(result):
+    # This should not be called since we try / catch everything in the 'process_file' function
     logging.error('Failed to process file')
     logging.exception(result)
 
 
-def process(configuration: LogParserConfig, db: DatabaseConnection, cloudstorage_bucket: Bucket, process_count: int):
+def process(configuration: LogParserConfig, db: DatabaseConnection, process_count: int):
     influxdb_client = get_client(configuration)
-    pool = Pool(process_count, maxtasksperchild=1)
+    pool = Pool(process_count)
+    currently_processing = defaultdict(list)
+    dl_dir = os.path.join(db.root_dir, 'data')
 
     while True:
-        new_files = [f for f in start_processing_logs(db, cloudstorage_bucket)
-                     if f not in queue and f not in processed_files]
-        if len(new_files) == 0:
-            logging.info('Nothing to process, sleeping %s seconds. %s tasks still in queue.', configuration.interval,
-                         len(queue))
+        logging.info('Checking for new files to process')
+        settings = db.get_settings()
+        new_files = get_new_files_to_process(configuration.buckets, settings)
+        settings.files.extend(new_files)
+        timestamp = int(time.time())
+        completed_files = defaultdict(list)
+        # Empty queue of finished work and create a lists of all completed files per bucket
+        while True:
+            if finished_queue.empty():
+                break
+            success, bucket, filename = finished_queue.get()
+            currently_processing[bucket].remove(filename)
+            if success:
+                completed_files[bucket].append(filename)
+        # Set processed timestamp on processed files
+        for file in settings.files:
+            if file.name in completed_files[file.bucket]:
+                file.processed_timestamp = timestamp
+        logging.info('%d files completed processing since last loop', sum(len(l) for l in completed_files.values()))
+        completed_files.clear()
+        db.save_settings(settings)
+        added = 0
+        for file in settings.files:
+            if file.processed_timestamp is None and file.name not in currently_processing[file.bucket]:
+                currently_processing[file.bucket].append(file.name)
+                pool.apply_async(process_file, (file.bucket, file.name, dl_dir, influxdb_client), {}, after_processed,
+                                 after_error)
+                added += 1
+        processing_count = sum(len(l) for l in currently_processing.values())
+        if added:
+            logging.info('Added %s files to pool, %s files currently processing.', added, processing_count)
+        else:
+            logging.info('Nothing new to process, sleeping %s seconds. %s files currently in queue to be processed.',
+                         configuration.interval, processing_count)
             time.sleep(configuration.interval)
             continue
-        logging.info('Processing %s files', len(new_files))
-        for file_name in new_files:
-            queue.add(file_name)
-            pool.apply_async(process_file, [file_name, db, influxdb_client, configuration], {}, after_processed,
-                             after_error)
 
 
 if __name__ == '__main__':
@@ -121,7 +143,5 @@ if __name__ == '__main__':
     parser.add_argument('--processes', type=int, help='Number of processes to use', default=os.cpu_count() * 2)
     parser.add_argument('--data_path', type=str, help='Path where the data will be stored. Defaults to ../parser',
                         default=os.path.join(CURRENT_DIR, '..', 'parser'))
-    parser.add_argument('--clean', action='store_true', help='Clean old data files to free up disk space',
-                        default=False)
     args = parser.parse_args()
-    main(args.processes, args.data_path, args.clean)
+    main(args.processes, args.data_path)

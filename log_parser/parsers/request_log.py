@@ -18,6 +18,9 @@ from datetime import datetime
 from typing import Iterator, Dict, Any
 from urllib.parse import urlparse
 
+properties = ['app_id', 'end_time', 'host', 'ip', 'latency', 'status', 'start_time', 'mcycles', 'resource',
+              'response_size', 'user_agent', 'task_queue_name', 'task_name', 'pending_time']
+
 
 def process(value: dict) -> Iterator[Dict[str, Any]]:
     request_info = value['data']
@@ -46,3 +49,13 @@ def process(value: dict) -> Iterator[Dict[str, Any]]:
         'time': datetime.utcfromtimestamp(request_info['start_time']).isoformat() + 'Z',
         'fields': fields
     }
+
+
+def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
+    request_info = {prop: request_log.get(prop) for prop in properties}
+    if request_info['task_name'] and request_log['protoPayload'].get('line', []):
+        log = request_log['protoPayload']['line'][0]
+        if 'X-Appengine-Taskretrycount' in log['message']:
+            headers = dict([tuple(header.split(':')) for header in log['message'].split(', ')])
+            request_info['task_retry_count'] = int(headers['X-Appengine-Taskretrycount'])
+    return process({'data': request_info})

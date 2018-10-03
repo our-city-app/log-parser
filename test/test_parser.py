@@ -105,3 +105,6 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(result[0]['fields']['amount'], 958)
         self.assertEqual(result[0]['tags']['app'], 'be-destelbergen')
         self.assertEqual(result[0]['measurement'], oca.Measurements.CUSTOM_LOYALTY_CARDS)
+
+    def test_request_log(self):
+        self.check_length('full-request-log.json', 1)

@@ -16,6 +16,7 @@
 # @@license_version:1.4@@
 
 import io
+import json
 import logging
 from typing import Iterator, Dict, Any, List, Union
 
@@ -39,6 +40,8 @@ log_types = {
     'web_channel': rogerthat.web_channel,
     'tf.web': threefold.web
 }
+
+PREFIXES = ['[XX-OFFLOADv1]', '[OFFLOAD] ']
 
 
 @request_filter('')
@@ -67,6 +70,22 @@ def guess_log_type(value: dict) -> Union[None, str]:
 
 
 def analyze(line: str) -> Iterator[dict]:
+    if '"@type":"type.googleapis.com/google.appengine.logging.v1.RequestLog"' in line:
+        # Contains an actual request log, process that first.
+        log = json.loads(line)
+        # Only the last log entry of a request log contains all request information like status code etc.
+        if log['operation'].get('last', False):
+            yield request_log.process_request_log(log)
+        for app_log in log['protoPayload'].get('line', []):
+            message = app_log['logMessage']
+            for prefix in PREFIXES:
+                if message.startswith(prefix):
+                    yield _analyze_possibly_broken_json(message.replace(prefix, ''))
+    else:
+        yield _analyze_possibly_broken_json(line)
+
+
+def _analyze_possibly_broken_json(line: str) -> Iterator[dict]:
     readers: Any = {}  # too complicated for proper types
     f = io.StringIO(line)
     data: Union[Dict, List]
