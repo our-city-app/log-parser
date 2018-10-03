@@ -1,0 +1,137 @@
+{
+  "timestamp": 1493628700,
+  "request_data": {
+    "a": [],
+    "c": [
+      {
+        "a": {
+          "request": null
+        },
+        "ci": "d7f12baf-9dc8-4d69-88e8-b3638420f805",
+        "f": "com.mobicage.api.system.getIdentity",
+        "t": "1493628551",
+        "av": 1
+      },
+      {
+        "a": {
+          "request": {
+            "netCountryCode": null,
+            "netCarrierName": "",
+            "minorVersion": 2652,
+            "appType": 4,
+            "product": "Rogerthat Android",
+            "timezoneDeltaGMT": -21600,
+            "timezone": "America/Chicago",
+            "localeLanguage": "en",
+            "simCountry": "",
+            "netCountry": "",
+            "majorVersion": 0,
+            "SDKVersion": "19",
+            "netCarrierCode": "",
+            "timestamp": "1493628547",
+            "simCarrierCode": "",
+            "networkState": "NetworkInfo: type: WIFI[], state: CONNECTED/CONNECTED, reason: (unspecified), extra: \"CometNet\", roaming: false, failover: false, isAvailable: true, isConnectedToProvisioningNetwork: false\nNetworkInfo: type: mobile[UNKNOWN], state: UNKNOWN/IDLE, reason: (unspecified), extra: (none), roaming: false, failover: false, isAvailable: false, isConnectedToProvisioningNetwork: false\n",
+            "simCountryCode": null,
+            "deviceModelName": "Nexus 4",
+            "localeCountry": "US",
+            "simCarrierName": "",
+            "flushBackLog": false,
+            "buildFingerPrint": "google/occam/mako:4.4.2/KOT49H/937116:user/release-keys"
+          }
+        },
+        "ci": "6ec07f0b-9fdd-4f05-8e60-461a01e26560",
+        "f": "com.mobicage.api.system.heartBeat",
+        "t": "1493628551",
+        "av": 1
+      },
+      {
+        "a": {
+          "request": {
+            "callLogging": false,
+            "tracking": true
+          }
+        },
+        "ci": "ec84c37f-d70f-4d60-b379-c01498971d30",
+        "f": "com.mobicage.api.system.saveSettings",
+        "t": "1493628697",
+        "av": 1
+      }
+    ],
+    "r": [],
+    "av": 1
+  },
+  "type": "app",
+  "response_data": {
+    "ap": "https://mobicagecloudhr.appspot.com/json-rpc",
+    "r": [
+      {
+        "s": "success",
+        "r": {
+          "shortUrl": "https://rogerth.at/M/OEX8.VITCZ",
+          "identity": {
+            "hasBirthdate": true,
+            "owncloudPassword": null,
+            "name": "John Doe",
+            "qualifiedIdentifier": null,
+            "profileData": null,
+            "birthdate": 633916800,
+            "gender": 2,
+            "owncloudUri": null,
+            "avatarId": 5891263126568960,
+            "email": "4f77124a9bb07d310e54bf4916a629ba",
+            "hasGender": true,
+            "owncloudUsername": null
+          }
+        },
+        "t": 1493628551,
+        "ci": "d7f12baf-9dc8-4d69-88e8-b3638420f805",
+        "av": 1
+      },
+      {
+        "s": "success",
+        "r": {
+          "systemTime": 1493628694
+        },
+        "t": 1493628551,
+        "ci": "6ec07f0b-9fdd-4f05-8e60-461a01e26560",
+        "av": 1
+      },
+      {
+        "s": "success",
+        "r": {
+          "settings": {
+            "geoLocationSamplingIntervalCharging": 900,
+            "operatingVersion": 0,
+            "useGPSCharging": true,
+            "recordPhoneCallsDays": 31,
+            "xmppReconnectInterval": 900,
+            "geoLocationTrackingDays": 127,
+            "geoLocationSamplingIntervalBattery": 900,
+            "geoLocationTrackingTimeslot": [
+              0,
+              86399
+            ],
+            "geoLocationTracking": true,
+            "version": 3,
+            "recordPhoneCallsTimeslot": [
+              0,
+              86399
+            ],
+            "backgroundFetchTimestamps": [],
+            "useGPSBattery": false,
+            "wifiOnlyDownloads": false,
+            "recordGeoLocationWithPhoneCalls": true,
+            "recordPhoneCalls": false
+          }
+        },
+        "t": 1493628551,
+        "ci": "ec84c37f-d70f-4d60-b379-c01498971d30",
+        "av": 1
+      }
+    ],
+    "av": 1,
+    "t": 1493628700,
+    "more": false
+  },
+  "user": "4f77124a9bb07d310e54bf4916a629ba"
+}

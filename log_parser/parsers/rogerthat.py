@@ -165,7 +165,7 @@ def app(value: dict) -> Iterator[Any]:
                     'app': app_id,
                     'type': call.get('f', UNKNOWN)
                 },
-                'time': datetime.utcfromtimestamp(call['t']).isoformat() + 'Z',
+                'time': datetime.utcfromtimestamp(int(call['t'])).isoformat() + 'Z',
                 'fields': {
                     'user': user
                 }

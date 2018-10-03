@@ -134,3 +134,6 @@ class ParserTest(unittest.TestCase):
                              {'project': 'e~rogerthat-server',
                               'task_queue_name': 'fast',
                               'status': 200})
+
+    def test_convert_string_time(self):
+        self.check_length('test-str-time.json', 3)
