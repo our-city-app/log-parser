@@ -32,13 +32,13 @@ def process(value: dict) -> Iterator[Dict[str, Any]]:
         'user_agent': request_info['user_agent'],
         'latency': float(request_info['latency']),
         'status': int(request_info['status']),
-        'mcycles': int(request_info['mcycles']),
+        'megaCycles': int(request_info['mcycles']),
         'response_size': request_info['response_size'],
-        'task_retry_count': int(request_info.get('task_retry_count', 0))
     }
     if request_info.get('task_name'):
         tags['task_queue_name'] = request_info['task_queue_name']
         fields['task_name'] = request_info['task_name']
+        fields['task_retry_count'] = int(request_info.get('task_retry_count', 0))
     yield {
         'measurement': 'request-info',
         'tags': tags,
@@ -60,19 +60,21 @@ def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
         'user_agent': proto_payload['userAgent'],
         'latency': float(proto_payload['latency'].rstrip('s')),
         'status': int(proto_payload['status']),
-        'mcycles': int(proto_payload['megaCycles']),
         'response_size': int(proto_payload['responseSize']),
-        'task_retry_count': int(proto_payload.get('task_retry_count', 0))
     }
+    if 'megaCycles' in proto_payload:
+        fields['megaCycles'] = int(proto_payload['megaCycles'])
+    retry_count = 0
     if proto_payload.get('taskName') and request_log['protoPayload'].get('line', []):
         log = proto_payload['line'][0]
         msg = log['logMessage']
         if 'X-Appengine-Taskretrycount' in msg:
             headers = dict([tuple(header.split(':')) for header in msg.split(', ')])
-            proto_payload['task_retry_count'] = int(headers['X-Appengine-Taskretrycount'])
+            retry_count = int(headers['X-Appengine-Taskretrycount'])
     if proto_payload.get('taskName'):
         tags['task_queue_name'] = proto_payload['taskQueueName']
         fields['task_name'] = proto_payload['taskName']
+        fields['task_retry_count'] = retry_count
     yield {
         'measurement': 'request-info',
         'tags': tags,
