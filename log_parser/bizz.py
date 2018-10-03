@@ -82,7 +82,6 @@ def get_unprocessed_logs(db: DatabaseConnection, cloudstorage_bucket: Bucket, ye
 
 
 def save_statistic_entries(client: InfluxDBClient, entries: List[dict]) -> bool:
-    logging.info('Writing %d datapoints to influxdb', len(entries))
     try:
         return client.write_points(entries)
     except InfluxDBClientError as e:
@@ -126,3 +125,4 @@ def process_logs(download_directory: str, influxdb_client: InfluxDBClient, cloud
                 to_save = to_save[MAX_DB_ENTRIES_PER_RPC:]
         if to_save:
             save_statistic_entries(influxdb_client, to_save)
+    os.remove(disk_path)
