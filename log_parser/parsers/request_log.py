@@ -57,7 +57,7 @@ def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
         'host': proto_payload['host'],  # e.g. version-xxx.rogerthat-server.appspot.com
         'resource': urlparse(proto_payload['resource']).path,  # strip query parameters
         'ip': proto_payload['ip'],
-        'user_agent': proto_payload['userAgent'],
+        'user_agent': proto_payload.get('userAgent'),
         'latency': float(proto_payload['latency'].rstrip('s')),
         'status': int(proto_payload['status']),
         'response_size': int(proto_payload['responseSize']),
