@@ -57,11 +57,13 @@ def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
         'host': proto_payload['host'],  # e.g. version-xxx.rogerthat-server.appspot.com
         'resource': urlparse(proto_payload['resource']).path,  # strip query parameters
         'ip': proto_payload['ip'],
-        'user_agent': proto_payload.get('userAgent'),
         'latency': float(proto_payload['latency'].rstrip('s')),
         'status': int(proto_payload['status']),
-        'response_size': int(proto_payload['responseSize']),
     }
+    if 'userAgent' in proto_payload:
+        fields['user_agent'] = proto_payload['userAgent']
+    if 'responseSize' in proto_payload:
+        fields['response_size'] = int(proto_payload['responseSize'])
     if 'megaCycles' in proto_payload:
         fields['megaCycles'] = int(proto_payload['megaCycles'])
     retry_count = 0
