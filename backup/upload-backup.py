@@ -7,6 +7,8 @@ from google.cloud import storage
 
 logging.getLogger().setLevel(logging.DEBUG)
 
+CHUNK_SIZE = 104857600  # 100MB
+
 
 def upload_file(filename, destination, bucket):
     """
@@ -15,7 +17,7 @@ def upload_file(filename, destination, bucket):
     """
     client = storage.Client()
     bucket = client.bucket(bucket)
-    blob = bucket.blob(destination)
+    blob = bucket.blob(destination, chunk_size=CHUNK_SIZE)
     blob.upload_from_filename(filename)
     return blob.public_url
 
