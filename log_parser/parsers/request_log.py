@@ -19,6 +19,10 @@ from typing import Iterator, Dict, Any
 from urllib.parse import urlparse
 
 
+def encode(text):
+    return text and text.encode('utf-8', 'replace')
+
+
 def process(value: dict) -> Iterator[Dict[str, Any]]:
     request_info = value['data']
     tags = {
@@ -29,7 +33,7 @@ def process(value: dict) -> Iterator[Dict[str, Any]]:
         'host': request_info['host'],  # e.g. version-xxx.rogerthat-server.appspot.com
         'resource': urlparse(request_info['resource']).path,  # strip query parameters
         'ip': request_info['ip'],
-        'user_agent': request_info['user_agent'].encode('utf-8', 'replace'),
+        'user_agent': encode(request_info['user_agent']),
         'latency': float(request_info['latency']),
         'status': int(request_info['status']),
         'megaCycles': int(request_info['mcycles']),
@@ -67,7 +71,7 @@ def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
         'status': int(proto_payload['status']),
     }
     if 'userAgent' in proto_payload:
-        fields['user_agent'] = proto_payload['userAgent'].encode('utf-8', 'replace')
+        fields['user_agent'] = encode(proto_payload['userAgent'])
     if 'responseSize' in proto_payload:
         fields['response_size'] = int(proto_payload['responseSize'])
     if 'megaCycles' in proto_payload:
