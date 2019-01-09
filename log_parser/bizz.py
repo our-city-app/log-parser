@@ -91,7 +91,7 @@ def save_statistic_entries(client: InfluxDBClient, entries: List[dict]) -> bool:
         else:
             logging.exception('Failed to write data to influxdb')
             raise
-    except UnicodeDecodeError as e:
+    except UnicodeEncodeError:
         logging.debug(entries)
         raise
 
