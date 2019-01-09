@@ -25,6 +25,7 @@ from multiprocessing import SimpleQueue
 from multiprocessing.pool import Pool
 from typing import Tuple
 
+import urllib3
 from google.cloud import storage
 from influxdb import InfluxDBClient
 
@@ -36,6 +37,7 @@ logging.basicConfig(format='%(levelname)-8s %(process)s %(asctime)s,%(msecs)3.0f
                     datefmt='%Y-%m-%d %H:%M:%S',
                     level=logging.DEBUG)
 logging.getLogger('urllib3').setLevel(logging.WARNING)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 CURRENT_DIR = os.path.dirname(__file__)
 
 finished_queue = SimpleQueue()

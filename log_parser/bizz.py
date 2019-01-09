@@ -91,6 +91,9 @@ def save_statistic_entries(client: InfluxDBClient, entries: List[dict]) -> bool:
         else:
             logging.exception('Failed to write data to influxdb')
             raise
+    except UnicodeDecodeError as e:
+        logging.debug(entries)
+        raise
 
 
 def process_logs(download_directory: str, influxdb_client: InfluxDBClient, cloudstorage_bucket: Bucket,
