@@ -18,6 +18,8 @@ import os
 import unittest
 from typing import List
 
+from influxdb.line_protocol import make_lines
+
 from log_parser.analyzer import analyze
 from log_parser.parsers import oca
 
@@ -117,6 +119,10 @@ class ParserTest(unittest.TestCase):
                                                'megaCycles': 138,
                                                'user_agent': 'be-herentals/2.1.2920 CFNetwork/974.2.1 Darwin/18.0.0'})
         self.assertDictEqual(result[0]['tags'], {'project': 'e~rogerthat-server', 'status': 200})
+
+    def test_request_log_useragent(self):
+        lines = self.check_length('full-request-log-malicious-useragent.json', 2)
+        make_lines({'points': lines})
 
     def test_task(self):
         result = self.check_length('test-log-task.json', 1)

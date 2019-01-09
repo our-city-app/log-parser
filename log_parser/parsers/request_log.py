@@ -29,7 +29,7 @@ def process(value: dict) -> Iterator[Dict[str, Any]]:
         'host': request_info['host'],  # e.g. version-xxx.rogerthat-server.appspot.com
         'resource': urlparse(request_info['resource']).path,  # strip query parameters
         'ip': request_info['ip'],
-        'user_agent': request_info['user_agent'],
+        'user_agent': request_info['user_agent'].encode('utf-8', 'replace'),
         'latency': float(request_info['latency']),
         'status': int(request_info['status']),
         'megaCycles': int(request_info['mcycles']),
