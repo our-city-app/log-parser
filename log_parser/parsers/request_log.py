@@ -53,11 +53,17 @@ def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
         'project': proto_payload.get('appId'),  # e.g. e~rogerthat-server,
         'status': proto_payload['status'],  # 200, 204, 500, ...
     }
+    try:
+        latency = float(proto_payload['latency'].rstrip('s'))
+    except ValueError:
+        # Sometimes latency is logged as '0.-21645', for some reason...
+        before, after = proto_payload['latency'].rstrip('s').split('.')
+        latency = float('%s.%s' % (abs(int(before)), abs(int(after))))
     fields = {
         'host': proto_payload['host'],  # e.g. version-xxx.rogerthat-server.appspot.com
         'resource': urlparse(proto_payload['resource']).path,  # strip query parameters
         'ip': proto_payload['ip'],
-        'latency': float(proto_payload['latency'].rstrip('s')),
+        'latency': latency,
         'status': int(proto_payload['status']),
     }
     if 'userAgent' in proto_payload:
