@@ -186,7 +186,7 @@ def api(value: dict) -> Iterator[Any]:
         'method': value.get('function'),
     }
     fields = {
-        'success': value.get('success')
+        'success': value.get('success', True)
     }
 
     if 'user' in value:
