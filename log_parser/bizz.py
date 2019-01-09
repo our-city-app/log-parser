@@ -87,7 +87,7 @@ def save_statistic_entries(client: InfluxDBClient, entries: List[dict]) -> bool:
     except InfluxDBClientError as e:
         if 'timeout' in e.content:
             logging.warning('Timeout while writing to influxdb. Retrying with smaller batch size...')
-            client.write_points(entries, batch_size=MAX_DB_ENTRIES_PER_RPC / 5)
+            client.write_points(entries, batch_size=MAX_DB_ENTRIES_PER_RPC / 5, protocol='json')
         else:
             logging.exception('Failed to write data to influxdb')
             raise
