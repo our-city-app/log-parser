@@ -67,7 +67,7 @@ def process_request_log(request_log: dict) -> Iterator[Dict[str, Any]]:
         'status': int(proto_payload['status']),
     }
     if 'userAgent' in proto_payload:
-        fields['user_agent'] = proto_payload['userAgent']
+        fields['user_agent'] = proto_payload['userAgent'].encode('utf-8', 'surrogatepass')
     if 'responseSize' in proto_payload:
         fields['response_size'] = int(proto_payload['responseSize'])
     if 'megaCycles' in proto_payload:
