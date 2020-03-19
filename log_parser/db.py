@@ -54,11 +54,14 @@ class DatabaseConnection(object):
         return settings
 
     def save_settings(self, settings: LogParserSettings) -> LogParserSettings:
-        f_path = os.path.join(self.root_dir, 'settings.json')
-        with open(f_path, 'w') as f:
-            f.write(json.dumps({
-                'files': [f.to_dict() for f in settings.files]
-            }))
+        # in case process is killed when writing we still have a backup
+        tmp_path = os.path.join(self.root_dir, 'settings.json.tmp')
+        settings_path = os.path.join(self.root_dir, 'settings.json')
+        content = {'files': [f.to_dict() for f in settings.files]}
+        with open(tmp_path, 'w') as f:
+            json.dump(content, f)
+        with open(settings_path, 'w') as f:
+            json.dump(content, f)
         return settings
 
     def get_all_processed_logs(self, year: str) -> typing.List[str]:

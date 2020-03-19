@@ -11,6 +11,7 @@ function backup {
   docker exec influxdb influxd backup -portable /tmp/backup
   # Backup grafana data
   sqlite3 monitoring/grafana/grafana.db ".backup './monitoring/backup/grafana.db'"
+  cp ./monitoring/parser/settings.json ./monitoring/backup/settings.json
 }
 
 function compress {
