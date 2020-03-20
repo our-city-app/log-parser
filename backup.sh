@@ -4,7 +4,6 @@ cd "$(dirname "$0")"
 function clean {
   find ./monitoring/backup/influxdb -mindepth 1 -delete
   rm -f ./monitoring/backup/grafana.db
-  rm -f ./monitoring/backup.tar.gz
 }
 
 function backup {
@@ -12,10 +11,6 @@ function backup {
   # Backup grafana data
   sqlite3 monitoring/grafana/grafana.db ".backup './monitoring/backup/grafana.db'"
   cp ./monitoring/parser/settings.json ./monitoring/backup/settings.json
-}
-
-function compress {
-  tar -cjvf ./monitoring/backup.tar.gz ./monitoring/backup
 }
 
 function upload {
@@ -29,6 +24,5 @@ function upload {
 
 clean
 backup
-compress
 upload
 clean
