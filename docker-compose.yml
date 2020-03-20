@@ -35,6 +35,6 @@ services:
     build: ./backup
     container_name: log-parser-backup
     volumes:
-      - ./monitoring/backup.tar.gz:/backup.tar.gz
+      - ./monitoring/backup:/backup
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/code/credentials.json
