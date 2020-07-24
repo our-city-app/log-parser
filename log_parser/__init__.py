@@ -142,7 +142,7 @@ def process(configuration: LogParserConfig, db: DatabaseConnection, process_coun
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser(description='Processes logs uploaded on cloudstorage')
-    parser.add_argument('--processes', type=int, help='Number of processes to use', default=os.cpu_count() * 2)
+    parser.add_argument('--processes', type=int, help='Number of processes to use', default=os.cpu_count())
     parser.add_argument('--data_path', type=str, help='Path where the data will be stored. Defaults to ../parser',
                         default=os.path.join(CURRENT_DIR, '..', 'parser'))
     args = parser.parse_args()

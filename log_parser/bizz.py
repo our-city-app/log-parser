@@ -28,7 +28,7 @@ from log_parser.analyzer import analyze
 from log_parser.db import DatabaseConnection, create_folder
 from log_parser.models import LogParserFile, LogParserSettings
 
-MAX_DB_ENTRIES_PER_RPC = 2000
+MAX_DB_ENTRIES_PER_RPC = 500
 storage_client = storage.Client.from_service_account_json(os.path.join(os.path.dirname(__file__), 'credentials.json'))
 
 

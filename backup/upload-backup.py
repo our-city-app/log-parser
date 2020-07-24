@@ -29,6 +29,7 @@ def main(root_dir):
     Uploads the backup to google cloud storage
     """
     folder = time.strftime('%Y-%m-%d %H:%M')
+    logging.info('Backing up folder %s', root_dir)
     for subdir, dirs, files in os.walk(root_dir):
         for filename in files:
             path = os.path.join(subdir, filename)

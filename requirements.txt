@@ -1,4 +1,4 @@
 urllib3[secure]
 google-cloud-storage
-influxdb
+influxdb==5.2.1
 ijson
